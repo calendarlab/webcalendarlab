@@ -11,5 +11,5 @@ Contrary to caldavzap,we focused on best user-experience of calendar based on ca
  Now,we are refactoring it  by working with vue.js and React
  
  reference:
-   caldavzap:http://www.inf-it.com/caldavzap/
+   caldavzap:<br>http://www.inf-it.com/caldavzap/
  
