@@ -1,5 +1,5 @@
 # webcalendarlab
-##a web calendar app similar to icalendar of icloud and based on caldavzap(http://www.inf-it.com/caldavzap/)
+##a web calendar app similar to icalendar of icloud and based on caldavzap
 Contrary to caldavzap,we focused on best user-experience of calendar based on caldav protocol, and  something happened as follows:<br>
  1.the brand new user-interface and user-experience like icalendar in style<br>
  2.add/remove/modify a calendar<br>
@@ -9,4 +9,7 @@ Contrary to caldavzap,we focused on best user-experience of calendar based on ca
  6.notification <br>
  
  Now,we are refactoring it  by working with vue.js and React
+ 
+ reference:
+   caldavzap:http://www.inf-it.com/caldavzap/
  
