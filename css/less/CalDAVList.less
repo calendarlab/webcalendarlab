@@ -1,0 +1,226 @@
+@charset "utf-8";
+@import "z";
+@import "css3";
+
+// ===登录成功后左侧的日历显示栏===
+// --变量定义、自定义函数及公共部分--
+	@border-c: #D1D1D1; 
+	@background-c: #f0f0f0; 
+	@menub-c: #fbfbfb; 
+	@menus-c: #dcdcdc; 
+	@font-h-c: #8e8e8e; 
+	@font-i-c: #333; 
+	@lefts-w: 249px;
+	@menu-w: 105px;
+	@title-w: 105px;
+	@owner-w: 49px;
+	@menu-item-h: 26px;
+	@menu-item-w: 90px;
+	@header-h: 46px;
+	@item-h: 21px;
+	@margin-auto: 12px;
+	@padding-auto: 11px;
+	@item-padding-auto: 10px;
+	@others-mt: 46px;
+	@label-r: 8px;
+
+
+	.bor-bottom (@w:1px, @c:@border-c) {
+		border-bottom: @w solid @c;
+	}
+
+	.bor-right (@w:1px, @c:@border-c) {
+		border-right: @w solid @c;
+	}
+
+	#resourceCalDAV_h, #ResourceCalDAVList {
+		// 公共部分
+		left: 0px;
+		width: @lefts-w;
+		background: @background-c;
+
+		.bor-right();
+	}
+
+	.myListItem, .othersListItem, #myListHeader, #othersListHeader {
+		// 公共部分
+		width: @lefts-w - @margin-auto * 2;
+		margin: 0 @margin-auto;
+		.bor-bottom();
+	}
+
+// --头部--
+	#resourceCalDAV_h {
+		height: @header-h;
+		border-bottom: none;
+        text-align: left;
+	}
+
+	#settings {
+		// 设置按钮
+		cursor: pointer;
+		margin: @margin-auto 0 0 @margin-auto;
+        padding-right: 30px;
+        background: url(../images/headerBtnBottom.png) no-repeat right 8px;
+        &:hover {
+            background: url(../images/headerBtnTop.png) no-repeat right 8px;
+        }
+	}
+	
+	#settingsMenu {
+		// --点击后的弹出框--
+		display: none;
+		width: @menu-w;
+		top: 40px;
+		left: 5px;
+	  	padding: 1px 0;
+	  		// 为了160...
+	  	background-color: @menub-c;
+	  	z-index: 26;
+
+		.abs();
+
+        border: 1px solid #D6D6D6;
+        border-radius: 4px;
+        box-shadow: 1px 1px 11px #B9B9B9;
+
+	}
+
+	#menu-setting, #menu-logout {
+		width: @menu-item-w;
+		height: @menu-item-h;
+		line-height: @menu-item-h;
+		padding: 0 7px;
+		cursor: pointer;
+	}
+
+	#menu-setting {
+		border-bottom: 1px solid @menus-c;
+	}
+
+	.menu-title {
+		// 文字标题
+		.font-s(12px);
+	}
+
+
+// --具体日历显示的头部--
+	#ResourceCalDAVList {
+		.abs();
+		.d-b();
+		top: @header-h;
+		bottom: 0px;
+		overflow: auto;
+		overflow-x: hidden;
+		cursor: default;
+
+		user-select: none;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+	}
+
+	#myListHeader, #othersListHeader {
+		// 我的日历和他人日历的头部容器
+		padding: 0 0 @padding-auto;
+	}
+
+	#othersListHeader {
+		// 他人日历
+		margin: @others-mt @margin-auto 0;
+	}
+
+	.ListHeaderTitle {
+		// 日历标题
+		color: @font-h-c;
+
+		.font-s(16px);
+	}
+
+	.ListHeaderPlus {
+		// 添加日历按钮
+		margin: 3px 0 0 0;
+
+		.fr();
+	}
+
+// --具体日历显示的条目--
+	.myListItem, .othersListItem {
+		height: @item-h;
+		padding: @item-padding-auto 0;
+	}
+
+// --CSS3实现的radio外观的checkbox--
+	.regular-checkbox {
+		.d-n();
+	}
+
+	.regular-checkbox + label {
+		padding: @label-r;
+		margin: 0 @margin-auto 0 0;
+		background-color: @background-c;
+		border: 1px solid black;
+		border-radius: 50%;
+		cursor: pointer;
+
+		-webkit-appearance: none;
+		-moz-appearance: none;
+
+		.d-ib();
+	}
+
+	.labelafter {
+		width: @label-r;
+		height: @label-r;
+		margin: 8px 0 0 5px;
+		border-radius: 50%;
+		background: black;
+		cursor: pointer;
+
+		.abs();
+	}
+
+// --item的后续项目--
+	.ListItemTitle {
+		// 具体日历的标题
+		color: @font-i-c;
+		width: @title-w;
+		white-space: nowrap;
+	    overflow: hidden;
+	    text-overflow: ellipsis;
+
+		.d-ib();
+		.font-s(16px);
+	}
+
+	.ListItemShare {
+		// 具体日历的分享
+		color: @font-h-c;
+		height: @item-h;
+		line-height: @item-h;
+		overflow: hidden;
+		margin: 0 0 -1px 10px;
+
+		.d-ib();
+		.font-s(10px);
+	}
+
+	.ListItemOwner {
+		// 订阅日历的来源
+		color: @font-h-c;
+		margin: 0 0 -1px 9px;
+		width: @owner-w;
+		white-space: nowrap;
+	    overflow: hidden;
+	    text-overflow: ellipsis;
+	    height: @item-h;
+		line-height: @item-h;
+	    text-align: right;
+
+		.d-ib();
+		.font-s(10px);
+	}
+	
+	.ListItemOption {
+		// 日历选项按钮
+		margin: 0 0 0 12px;
+	}

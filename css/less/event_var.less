@@ -1,0 +1,55 @@
+@charset "utf-8";
+
+// 新建事件对话框中的变量定义 
+
+@pl_indent: 15px;
+	// 左侧的padding-left值
+@container_ml: 10px;
+	// .oneTopContainer和.oneBottomContainer左侧的margin-left值，实现间断线效果
+
+// 各种宽度
+	@event_details_w: 403px;
+		// 对话框的宽度（左右1px border）
+	@container_w: 373px;
+		// 具体属性的容器宽度（左右1px border）
+	@label_w: 83px;
+		// label的宽度即左侧显示的提示
+	@ds_w: 160px;
+		// dateSelect的宽度，即选择具体年月日
+	@tc_w: 100px;
+		// #time_from_cell, #time_to_cell的宽度
+
+// 各种高度
+	@container_h: 39px;
+		// 具体属性的容器高度（若是位于上面的容器还要减去下边框的1px border）
+	@line_h: 30px;
+		// 行高
+
+// 各类颜色
+	@event_details_bgc: #fbfbfb;
+		// 对话框的背景颜色
+	@text-c: #8e8e8e;
+		// 各类文字的颜色
+	@saveB_c: #4bce0d;
+		// 确定按钮的颜色
+	@closeB_c: #8e8e8e;
+		// 取消按钮的颜色
+	@deleteB_c: #ff0000;
+		// 删除按钮的颜色
+		
+// border...相关
+	@container_br: 3px;
+		// 容器的圆角值
+
+	.bor( @w:1px, @c:#ddd ) {
+		border: @w solid @c;
+	}
+
+	.bor-bottom( @w:1px, @c:#ddd ) {
+		border-bottom: @w solid @c;
+	}
+
+	.bor-left( @w:1px, @c:#ddd ) {
+		border-left: @w solid @c;
+	}
+

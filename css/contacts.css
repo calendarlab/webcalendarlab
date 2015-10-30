@@ -1,0 +1,319 @@
+#contacts {
+    display: none;
+    overflow: hidden;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 26;
+
+    margin: -200px 0 0 50px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    width: 380px;
+    min-height: 168px;
+    max-height: 537px;
+
+    background: #fbfbfb;
+}
+
+.searchli {
+    margin: 0 0 0 40px !important;
+    border: none;
+    border-radius: 5px;
+    width: 324px;
+    height: 40px;
+
+    font-size: 16px;
+    line-height: 35px;
+
+    color: #555;
+
+    outline: none;;
+}
+
+.borderSpan {
+    display: block;
+
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.borderSpan:after {
+    position: absolute;
+
+    margin: 53px 0 0 -365px;
+    border-top: 1px solid #d1d1d1;
+    width: 380px;
+
+    content: "";
+}
+
+.group .myContacts li {
+    border-bottom: 1px solid #ccc;
+    padding-left: 30px;
+
+    line-height: 38px;
+
+    background: url(../images/ToBeChosen_contact.png) no-repeat 1px 10px;
+
+    cursor: pointer;
+}
+
+.group .myContacts li.active {
+    background: url(../images/chosen_contact.png) no-repeat 1px 10px;
+}
+
+.groupContainer {
+    display: block;
+
+    margin-top: 10px;
+    border-bottom: 1px solid #ccc;
+    padding-left: 30px;
+    height: 30px;
+
+    line-height: 30px;
+
+    background: url(../images/btn_arrow_next.png) no-repeat 7px 7px;
+}
+
+.myContacts img {
+    float: right;
+
+    margin-top: 8px;
+    margin-right: 20px;
+}
+
+.lingdao strong {
+    padding-left: 40px;;
+}
+
+#resetContactBtn {
+    position: absolute;
+
+    margin: 10px 0 0 -23px;
+}
+
+.groupTitle,
+.groupCount {
+    font-size: 16px;
+
+    color: #999;
+}
+
+.groupTitle {
+    cursor: pointer;
+}
+
+.group .myContacts li span {
+    font-size: 16px;
+
+    color: #555;
+}
+
+.myContacts {
+    display: none;
+    overflow: auto;
+
+    max-height: 400px;
+}
+
+
+/*-------------他人日历列表部分---------------------*/
+#addOthersCalendarDetail {
+    display: none;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 30;
+
+    margin: -200px 0 0 -352px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0 10px;
+    width: 380px;
+    height: 402px;
+
+    background-color: #fbfbfb;
+}
+
+#addOthersCalendarDetail p {
+    height: 45px;
+
+    font-size: 20px;
+    line-height: 45px;
+    text-align: center;
+
+    color: #999;
+}
+
+.others-calendars-ul {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0 10px;
+    /*max-height:255px;*/
+    /*display: none; */
+    width: 358px;
+
+    background-color: #fff;
+}
+.others-calendars-ul li {
+    overflow: hidden;
+
+    position: relative;
+    top: 1px;
+
+    border-bottom: 1px solid #ccc;
+
+    line-height: 39px;
+
+    background: url(../images/ToBeChosen_contact.png) no-repeat 0 8px;
+}
+.others-calendars-ul li.active {
+    background: url(../images/chosen_contact.png) no-repeat 0 8px;
+}
+.others-calendars-ul strong {
+    float: left;
+    overflow: hidden;
+
+    padding-left: 25px;
+    width: 215px;
+
+    font-size: 16px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: #555;
+
+    cursor: pointer;
+}
+
+.others-calendars-ul span {
+    margin-left: 5px;
+
+    font-size: 14px;
+
+    color: #999;
+}
+
+/*-- 邀请时间信息对话框部分 --*/
+#invitationEventBox {
+    display: none;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 26;
+
+    margin: -212px 0 0 -230px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    width: 460px;
+    height: 424px;
+
+    background-color: #fbfbfb;
+}
+.invitationEventBoxul1 {
+    overflow: hidden;
+
+    margin: 13px auto;
+    border: 2px solid #4bce0e;
+    border-radius: 50px;
+    width: 276px;
+}
+.invitationEventBoxul1 li {
+    float: left;
+
+    width: 50%;
+    height: 26px;
+
+    font-size: 16px;
+    line-height: 26px;
+    text-align: center;
+
+    color: #26c008;
+
+    cursor: pointer;
+}
+.invitationEventBoxul1 li.active {
+    color: #fff;
+    background: #4bce0e;
+}
+.box-bottom {
+    overflow-y: auto;
+
+    border-top: 1px solid #ccc;
+    padding: 0 20px;
+    height: 352px;
+}
+.box-con1,
+box-con2 {
+    display: block;
+}
+
+.box-con1-one {
+    position: relative;
+}
+.box-con1-one h6 {
+    font-size: 14px;
+    line-height: 35px;
+
+    color: #7d7d7d;
+}
+.box-con1-one h5 {
+    font-size: 14px;
+    line-height: 20px;
+
+    color: #3e3b3b;
+}
+
+.box-con1-one h5 strong {
+    display: inline-block;
+
+    margin-right: 10px;
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+
+    background: red;
+}
+.box-yesno {
+    position: absolute;
+    top: 54px;
+    right: 10px;
+}
+.box-yesno span {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 12px;
+
+    color: #6d6d6d;
+
+    cursor: pointer;
+}
+.box-yesno span:hover {
+    color: #fff;
+    background: #4bce0e;
+}
+.box-con1-one-div {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 10px;
+
+    background-color: #fff;
+}
+.box-con1-one-div p {
+    padding-left: 21px;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+
+    color: #7d7d7d;
+}
+.box-con2 {
+    display: none;
+}

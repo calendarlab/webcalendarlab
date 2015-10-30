@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en" manifest="cache.manifest">
+<!-- <html lang="en"> -->
+<head>
+    <title>CMRILBS_CalDavZAP</title>
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <link rel="stylesheet" href="css/default.css" type="text/css" />
+    <link rel="stylesheet" href="css/event.css" type="text/css" />
+    <link rel="stylesheet" href="css/index.css" type="text/css" />
+    <link rel="stylesheet" href="css/CalDAVList.css" type="text/css" />
+    <link rel="stylesheet" href="css/jquery-ui.custom.css" type="text/css" />
+    <link rel="stylesheet" href="css/spectrum.custom.css" type="text/css" />
+    <link rel="stylesheet" href="css/fullcalendar.css" type="text/css" />
+    <link rel="stylesheet" href="css/jquery.mCustomScrollbar.css" type="text/css" />
+    <link rel="stylesheet" href="css/list-color.css" type="text/css" />
+    <link rel="stylesheet" href="css/contacts.css" type="text/css" />
+    <link rel="stylesheet" href="css/vue_comps.css" type="text/css" />
+    <!--
+        CalDavZAP - the open source CalDAV Web Client
+        Copyright (C) 2011-2015
+            Jan Mate <jan.mate@inf-it.com>
+            Andrej Lezo <andrej.lezo@inf-it.com>
+            Matej Mihalik <matej.mihalik@inf-it.com>
+
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Affero General Public License as
+        published by the Free Software Foundation, either version 3 of the
+        License, or (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU Affero General Public License for more details.
+
+        You should have received a copy of the GNU Affero General Public License
+        along with this program. If not, see <http://www.gnu.org/licenses/>.
+    -->
+</head>
+
+<body>
+    <div id="cacheDialog">
+        <div id="cacheDialogText">newer version detected!</div>
+        <div id="cacheDialogButtonWrapper">
+            <input id="cacheDialogButton" type="button" value="refresh" onclick="window.location.reload()"/>
+        </div>
+    </div>
+
+    <div id="MainLoader">
+        <div id="MainLoaderInner" class="loaderInfo">Loading ...</div>
+        <div class="loader"></div>
+    </div>
+
+    <div id="LoginPage" style="opacity: 1; display:none">
+        <div id="index_wrapper">
+            <img src="images/LOGO.png" alt="logo..." id="index_logo">
+
+            <div class="form" id="login">
+                <span class="index_title">登录企业日历</span> 
+                <form onsubmit="return false;" autocomplete="on" id="index_form"> 
+                    <div class="ero_tixing">账号或者密码错误</div>
+                    <label class="icon_wrapper">
+                        <img src="images/usr_icon.png" alt="usr_icon" id="usr_icon">
+                    </label>
+                    <input id="username" data-type="system_username" name="username" required="required" type="text" placeholder="企业帐号"/>
+
+                    <label class="icon_wrapper">
+                        <img src="images/psd_icon.png" alt="psd_icon" id="psd_icon">
+                    </label>
+                    <input id="password" data-type="system_password" name="password" required="required" type="password" placeholder="密码" /> 
+
+                    <div class="login_keep">
+                        <input type="checkbox" name="loginkeeping" id="loginkeeping" value="loginkeeping" /> 
+                        <label for="loginkeeping">下次自动登录</label>                    
+                    </div>
+
+                    <input type="submit" value="登录" id="login_btn" data-type="system_login" onclick="if(event.shiftKey)ignoreServerSettings=true;login();"/>
+
+                    <div class="link_to_oa">
+                        <span>忘记企业帐号密码？<a href="javascript:;" id="href_to_oa">进入企业OA系统</a></span>
+                    </div>
+                </form>
+            </div>
+
+            <div id="login_message" style="display: none;"></div>
+            <div id="LoginLoader">
+                <div class="loader"></div>
+            </div>
+
+        </div>
+        <!-- <div class="footer">This is SOFTWARE!!!</div> -->
+    </div>
+
+    <div id="AlertDisabler"></div>
+
+    <div id="alertBox">
+        <h1>Alerts</h1>
+        <div id="alertBoxContent"></div>
+        <input type="button" value="Clear Alerts" onclick="clearAlertEvents();" />
+    </div>
+    
+    <div class="System" id="SystemCalDavZAP">
+        <div id="vue_comps">
+            <div id="allDayAlertSelectWrapper">
+                <div class="modalDisable" :style="{zIndex: modalZ}" @click="modalDisableClick"></div>
+                <div id="allDayAlertSelect" v-show="isShow">
+                    <ul class="allDayAlertSelect_content">
+                        <li @click = "isDIY = false;" :class = "{'active': !isDIY}">无</li>
+                        <li @click = "isDIY = true;"  :class = "{'active': isDIY}">
+                            自定义
+                            <span class="allDayAlertSelect_timeTXT">{{timeTXT}}</span>
+                        </li>
+                    </ul>
+
+                    <div class="allDayAlertSelect_time" v-show="isDIY">
+                        <time_count_comp :count.sync="dayCount" :time_txt.sync="timeDayTXT" count_type="day"></time_count_comp>
+                        <time_count_comp :count.sync="hourCount" :time_txt.sync="timeHourTXT" count_type="hour"></time_count_comp>
+                    </div>
+                </div>
+            </div>
+
+            <div id="AlertWrapper" v-show="isShow">
+                <div v-for = "item in alertItems">
+                    <component 
+                        is = "alert-component"
+                        v-show = "item.isShow">
+
+                        <span class="alertColor" :style = "{backgroundColor: item.color};"></span>
+                        <span class="alertTitle">{{item.title}}</span>
+                        <span class="alertDetail">{{item.detail}}</span>
+                    </component>
+                </div>
+            </div>
+        </div>   
+
+        <!--seting-->
+        <div id="setting-content" class="setting-content">
+            <div  class="settingContentContainer">
+                <p class="god-set">偏好设置</p>
+                <ul class="settingContainerThree" style="position: relative;">
+                    <li>
+                        <h6 class="setWidth33">默认日历</h6>
+                        <div class="defaultCalendar">
+                            <span></span>
+                            <p>工作</p>
+                            <strong>共享日历</strong>
+                        </div>
+                    </li>
+                    <ol class="settingMy">
+                        <li class="calendarliTemplate">
+                            <span></span>
+                            <p>工作</p>
+                            <strong class="Mycho"></strong>
+                            <strong class="sharedli">共享日历</strong>
+                        </li>
+                    </ol>
+
+                </ul>
+                <ul class="settingContainerThree">
+                    <li>
+                        <h6 class="setWidth66">默认提醒时间</h6>
+                        <div class="setWidthTime">
+                            无
+                        </div>
+                    </li>
+                </ul>
+                <ul class="settingContainerThree active">
+                    <li>
+                        <h6 class="setWidth67">提醒及通知铃声</h6>
+                        <strong id="SettingsAlertOnOff">
+                            <div class="sharedOpen">
+                                <span class="setChoose active"></span>
+                                开
+                            </div>
+                            <div  class="sharedClose">
+                                <span class="setChoose"></span>
+                                关
+                            </div>
+                        </strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 新增日历对话框 -->
+        <div class="list-box" id="list_MKCalendar">
+            <ul class="list-content">
+                <li><input class="list_txt" type="text" placeholder="标题"></li>
+                <li class="list-strong">
+                    <p>共享日历</p>
+                    <div class="list-strong-cont2">
+                        <div class="sharedOpen">
+                            <span class="setChoose active"></span>
+                            开
+                        </div>
+                        <div  class="sharedClose">
+                            <span class="setChoose"></span>
+                            关
+                        </div>
+                    </div>
+                </li>
+                <li class="liColor">
+                    <p>颜色</p>
+                    <div class="list-color">
+                        <span class="active" style="background-color:#b3d1eb"></span>
+                        <span style="background-color:#d4bad7;"></span>
+                        <span style="background-color:#ffcc00;"></span>
+                        <span style="background-color:#9acccd;"></span>
+                        <span style="background-color:#99cc67;"></span>
+                        <span style="background-color:#9999cd;"></span>
+                        <span style="background-color:#66cbff;"></span>
+                        <div class="list-spanCur"></div>
+                    </div>
+                </li>
+                <li id="listAdd">新增日历</li>
+                <div class="list-cur"></div>
+            </ul>
+        </div>
+
+        <!-- 编辑日历对话框 -->
+        <div class="list-box" id="list_EditCalendar">
+            <ul class="list-content">
+                <li><input class="list_txt" type="text" placeholder="标题"></li>
+                <li class="list-strong">
+                    <p>共享日历</p>
+                    <div class="list-strong-cont">
+                        <div class="sharedOpen">
+                            <span class="setChoose active"></span>
+                            开
+                        </div>
+                        <div  class="sharedClose">
+                            <span class="setChoose"></span>
+                            关
+                        </div>
+                    </div>
+                </li>
+                <li class="liColor">
+                    <p>颜色</p>
+                    <div class="list-color">
+                        <span style="background: #b3d1eb" class="active"></span>
+                        <span style="background: #d4bad7;"></span>
+                        <span style="background: #ffcc00;"></span>
+                        <span style="background: #9acccd;"></span>
+                        <span style="background: #99cc67;"></span>
+                        <span style="background: #9999cd;"></span>
+                        <span style="background: #66cbff;"></span>
+                        <div class="list-spanCur"></div>
+                    </div>
+                </li>
+                <li id="listDelete">删除日历</li>
+                <div class="list-cur"></div>
+            </ul>
+        </div>
+
+        <!-- 查看他人日历对话框 -->
+        <div class="list-box" id="list_ViewCalendar">
+            <ul class="list-content">
+                <li><input class="list_txt" type="text" placeholder="标题"></li>
+                <li class="list-Owner">
+                    <p>共享人</p>
+                    <span>张皓然</span>
+                </li>
+                <li class="liColor">
+                    <p>颜色</p>
+                    <div class="list-color">
+                        <span style="background: #b3d1eb" class="active"></span>
+                        <span style="background: #d4bad7;"></span>
+                        <span style="background: #ffcc00;"></span>
+                        <span style="background: #9acccd;"></span>
+                        <span style="background: #99cc67;"></span>
+                        <span style="background: #9999cd;"></span>
+                        <span style="background: #66cbff;"></span>
+                        <div class="list-spanCur"></div>
+                    </div>
+                </li>
+                <li id="listUnsubscribe">删除日历</li>
+                <div class="list-cur"></div>
+            </ul>
+        </div>
+
+        <div class="ezz"></div>
+
+
+        <div id="EventDisabler"></div>
+
+        <div id="noDay" class="noDay">
+            <ul id="noDayContent" class="noDayContent">
+                <li value="-1,-1,-1" class="active">无</li>
+                <li value="0,0,0">事件发生时</li>
+                <li value="0,0,5">5分钟前</li>
+                <li value="0,0,30">30分前</li>
+                <li value="0,1,0">1小时前</li>
+                <li value="0,2,0">2小时前</li>
+                <li value="1,0,0">1天前</li>
+                <li value="2,0,0">2天前</li>
+                <li value="7,0,0">一周前</li>
+            </ul>
+        </div>
+
+        <!-- 联系人对话框 -->
+        <div id="contacts">
+            <div class="borderSpan">
+                <img src="images/contacts_search.png" style="position: absolute; margin: 10px 10px 0 10px;">
+                <input class="searchli" type="text" placeholder="搜索">
+                <img id="resetContactBtn" src="images/reset_contact.png" style="visibility: visible;">
+            </div>
+        </div>
+
+        <!-- 添加他人日历对话框 -->
+        <div id="addOthersCalendarDetail">
+            <p>添加他人日历</p>
+            <ul class="others-calendars-ul"></ul>
+        </div>
+
+        <!-- 邀请事件消息对话框 -->
+        <div id="invitationEventBox">
+            <ul class="invitationEventBoxul1">
+                <li class="active">新事件邀请</li>
+                <li class="">已回复邀请</li>
+            </ul>
+            
+            <ul class="box-bottom">
+                <li class="box-con1"></li>
+
+                <li class="box-con2"></li>
+            </ul>
+        </div>
+
+        <!-- 设置图标 -->
+        <div class="headers" id="resourceCalDAV_h">
+            <span id="settings" class="headerBtn"></span>
+        </div>
+
+        <!-- 弹出的设置菜单：偏好设置 ｜ 新建事件、新建日历、删除事件 ｜ 前往今天、前往日期 -->
+        <div id="settingsMenu">
+            <div id="menu-setting">
+                <span class="menu-title">偏好设置</span>
+            </div>
+            <div id="menu-logout">
+                <span class="menu-title">注销账号</span>
+            </div>
+        </div>
+
+        <div id="CalDavZAPPopup">
+            <div id="CalDavZAPPopupColor"></div>
+            <table id="CalDavZAPPopupTable">
+                <tr>
+                    <td colspan="2" class="header multiline" data-type="name"></td>
+                </tr>
+                <tr>
+                    <td class="label" data-type="location_txt">location</td>
+                    <td class="value" data-type="location"></td>
+                </tr>
+                <tr>
+                    <td class="label" data-type="from_txt">from</td>
+                    <td class="value" data-type="from"></td>
+                </tr>
+                <tr>
+                    <td class="label" data-type="to_txt">to</td>
+                    <td class="value" data-type="to"></td>
+                </tr>
+                <tr>
+                    <td class="label" data-type="status_txt">status</td>
+                    <td class="value" data-type="status"></td>
+                </tr>
+                <tr>
+                    <td class="label" data-type="avail_txt">availability</td>
+                    <td class="value" data-type="avail"></td>
+                </tr>
+                <tr>
+                    <td class="label" data-type="type_txt">privacy</td>
+                    <td class="value" data-type="type"></td>
+                </tr>
+                <tr>
+                    <td class="label" data-type="priority_txt">priority</td>
+                    <td class="value" data-type="priority"></td>
+                </tr>
+                <tr>
+                    <td class="label" data-type="calendar_txt">calendar</td>
+                    <td class="value" data-type="calendar"></td>
+                </tr>
+                <tr>
+                    <td class="label" data-type="url_txt">url</td>
+                    <td class="value" data-type="url"></td>
+                </tr>
+                <tr>
+                    <td class="label" data-type="note_txt">note</td>
+                    <td class="value multiline" data-type="note"></td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div id="ResourceCalDAVList">
+            <div id="myCalDAVList">
+                <div id="myListHeader">
+                    <!-- 我的日历的日历头部 -->
+                    <span class="ListHeaderTitle">我的日历</span>
+                    <input type="image" src="images/list_plus.png" alt="add calendar" class="ListHeaderPlus"></input>
+                </div>
+
+                <div id="myListItems">
+                    <div id="myListItemTemplate" style="display: none;">
+                        <!-- 我的日历的日历模板 -->
+                        <div class="myListItem"></div>
+                    </div>
+                    
+                    <div id="ResourceCalDAVListTemplate" style="display: none;">
+                        <div class="resourceCalDAV_header"><input type="checkbox"></div>
+                        <div class="resourceCalDAV_item"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="othersCalDAVList">
+                <div id="othersListHeader">
+                    <!-- 他人日历的日历头部 -->
+                    <span class="ListHeaderTitle">他人日历</span>
+                    <input type="image" src="images/list_plus.png" alt="add others' calendar" class="ListHeaderPlus">
+                </div>
+
+                <div id="othersListItemTemplate" style="display: none;">
+                    <!-- 他人日历的日历模板 -->
+                    <div class="othersListItem"></div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="headers" id="main_h">
+            <div id="main_h_placeholder"></div>
+        </div>
+
+        <div id="CalendarLoader">
+            <div class="loaderInfo">Calendaring ...</div>
+            <div class="loader"></div>
+        </div>
+
+        <div id='main'>
+            <div id='calendar'></div>
+        </div>
+
+        <div id="CAEvent">
+            <div id="repeatConfirmBox">
+                <h1 data-type="repeat_event">Repeat event confirmation</h1>
+                <div id="repeatConfirmBoxContent"></div>
+                <div id="repeatConfirmBoxQuestion"></div>
+                <input id='editAll' type="button" value="All events" /><br />
+                <input id='editFuture' type="button" value="All future events" /><br />
+                <input id='editOnlyOne' type="button" value="This event only"/><br />
+                <input type="button" data-type="closeRepeat" value="Close" onclick="$('#repeatConfirmBoxContent').html(''); $('#repeatConfirmBox').css('visibility', 'hidden'); $('#EventDisabler').fadeOut(globalEditorFadeAnimation);" />
+            </div>
+            
+            <div id="event_details_template">
+                <div id="eventDetailsContainer">
+                    <div id="eventDetailsTable">
+                        <div class="headerContainer">
+                            <textarea class="header" data-type="name" placeholder="Name" name="name" id="name"></textarea>
+                        </div>
+
+                        <div class="outerContainer">
+                            <div class="oneTopContainer">
+                                <div class="label">
+                                    <label data-type="all_day" for="allday">all-day: </label>
+                                </div>
+                                <div class="labelRightContent">
+                                    <input id="allday" class="long" type="checkbox" name="allday"/>
+                                </div>
+                            </div>
+                            <div class="oneMidContainer">
+                                <div class="label" style="display: inline-block; height: 100%;">
+                                    <label data-type="from" for="date_from">from: </label>
+                                </div>
+                                <div class="dateSelect">
+                                    <input id="date_from" class="date small" type="text" data-type="PH_date_from" placeholder="Date from" name="date_from"/>
+                                </div>
+                                <div id="time_from_cell"> 
+                                    <input class="time small" type="text" data-type="PH_time_from" placeholder="Time from" id="time_from" name="time_from"/>
+                                </div>
+                            </div>
+                            <div class="oneBottomContainer">
+                                <div class="label">
+                                    <label data-type="to" for="date_to">to: </label>
+                                </div>
+                                <div class="dateSelect">
+                                    <input class="date small" type="text" data-type="PH_date_to" placeholder="Date to" id="date_to" name="date_to"/>
+                                </div>
+                                <div id="time_to_cell">
+                                    <input class="time small" type="text" data-type="PH_time_to" placeholder="Time to" id="time_to" name="time_to"/>
+                                </div>
+                            </div>          
+                        </div>
+
+                        <div class="outerContainer">
+                            <div class="oneTopContainer">
+                                <div class="label">
+                                    <label data-type="repeat" for="repeat">repeat: </label>
+                                </div>
+                                <div class="labelRightContent" data-size="full" >
+                                    <select id="repeat" class="long" name="repeat">
+                                        <option data-type="repeat_no-repeat" value="no-repeat">No repeat</option>
+                                        <option data-type="repeat_DAILY" value="DAILY">Daily</option>
+                                        <option data-type="repeat_WEEKLY" value="WEEKLY">Weekly</option>
+                                        <option data-type="repeat_TWO_WEEKLY" value="TWO_WEEKLY">Bi-weekly</option>
+                                        <option data-type="repeat_MONTHLY" value="MONTHLY">Monthly</option>
+                                        <option data-type="repeat_YEARLY" value="YEARLY">Yearly</option>
+                                        <!-- <option data-type="repeat_BUSINESS" value="BUSINESS">Every business day</option>
+                                        <option data-type="repeat_WEEKEND" value="WEEKEND">Every weekend</option> -->
+                                        <!-- <option data-type="repeat_CUSTOM_WEEKLY" value="CUSTOM_WEEKLY">Custom weekly</option>
+                                        <option data-type="repeat_CUSTOM_MONTHLY" value="CUSTOM_MONTHLY">Custom monthly</option>
+                                        <option data-type="repeat_CUSTOM_YEARLY" value="CUSTOM_YEARLY">Custom yearly</option> -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="endrepeatContainer">
+                                <div id="repeat_details">
+                                    <div class="label repeat"><label data-type="repeat_end"  for="repeat_end_details">end: </label></div>
+
+                                    <div class="labelRightContent" data-size="full" >
+                                        <!-- <div data-size="half"> -->
+                                            <!-- <select class="small" id="repeat_end_details">
+                                                <option data-type="repeat_details_on_date" value="on_date">on date</option>
+                                                <option data-type="repeat_details_after" value="after">occurrences</option>
+                                                <option data-type="repeat_details_never" value="never">never</option>
+                                            </select> -->
+                                        <!-- </div> -->
+                                        <span style="font-size: 16pt; color: #8e8e8e;">于日期</span>
+                                        <input type="hidden" id="repeat_end_details" value="on_date"></input>
+
+                                        <!-- <div style="position: relative; display: inline-block;"> -->
+                                            <input class="date small" type="text" data-type="PH_until_date" placeholder="Date until" name="end" id="repeat_end_date" style="width: 160px; text-indent: 30px;" />
+                                            <!-- <input style="display: none;" class="small" type="text" data-type="PH_repeat_count" placeholder="Repeat count" name="end" id="repeat_end_after" /> -->
+                                            <!-- <div class="invalidWrapper"><img data-type="invalidSmall" style="display: none;" src="images/error_b.svg" alt="invalid" /></div> -->
+                                        <!-- </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>  
+
+                        <div class="outerContainer">
+                            <div class="oneTopContainer">
+                                <div id="calendarLine">
+                                    <div class="label">
+                                        <label data-type="event_calendar" for="event_calendar">calendar: </label>
+                                    </div>
+                                    <div class="labelRightContent" data-size="full">
+                                        <div id="eventColor" style="display: inline-block;"></div>
+                                        <select class="long R_calendar" name="calendar" id="event_calendar">
+                                            <option data-type="choose_calendar" value="choose">Select a calendar</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="oneBottomContainer">
+                                <div id="partner">
+                                    <div class="label">
+                                        <label data-type="event_partner" for="event_partner">
+                                            被邀请人
+                                        </label>
+                                    </div>
+                                    <div class="labelRightContent" data-size="full">
+                                        <span id="addPartnerTxt">添加被邀请人...</span>
+                                        <input type="image" src="images/add_partner.png" alt="add partner" id="addPartner">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="outerContainer">
+                            <div class="oneBottomContainer">
+                                <div class="label">
+                                    <label data-type="alert" for="alert">提醒</label>
+                                </div>
+                                <div class="labelRightContent" data-size="full" >
+                                    <span id="alertTxt" value="-1,-1,-1">无</span>
+                                    <input type="image" src="images/set1_1.gif" alt="set alert" id="alertButton">
+                                </div>
+                            </div>  
+
+                            
+                        </div>
+                        <div class="outerContainer">
+                            <!-- <div class="oneTopContainer">
+                                <div id="url_tr">
+                                       
+                                        <div class="label">
+                                            <label data-type="txt_url_EVENT" for="url_EVENT">url:</label>
+                                        </div>
+                                   
+                                    <input class="long" data-type="url_EVENT" type="text" placeholder="url" name="url_EVENT" id="url_EVENT" />
+                                </div>
+                            </div> -->
+                            <div class="lastContainer">
+                                <div id="note_tr">
+                                    <!-- 
+                                        <div class="label">
+                                            <label data-type="note" for="note">note: </label>
+                                        </div> 
+                                    -->
+                                    <textarea class="long" name="note" data-type="PH_note" placeholder="Note" id="note" rows="2" cols="20"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table style="display:none;">
+                            <tr>
+                                <td class="label"><label data-type="location" for="location">location:</label></td>
+                                <td colspan="2"><input class="long" data-type="PH_location" type="text" placeholder="Location" name="location" id="location" /></td>
+                            </tr>
+
+                            <tr class="timezone_row">
+                                <td class="label"><label data-type="txt_timezone" for="timezone">timezone: </label></td>
+                                <td colspan="2" data-size="full">
+                                    <select class="long" data-type="timezones" name="timezone" id="timezone"></select>
+                                </td>
+                            </tr> 
+
+                            <tr id="repeat_interval" style="display: none;">
+                                <td class="label repeat"><label data-type="repeat_type" for="repeat_interval_detail">Every </label></td>
+                                <td style="position: relative;">
+                                    <input class="small" type="text" data-type="PH_type_Interval" placeholder="Interval" name="end" id="repeat_interval_detail" />
+                                    <div class="invalidWrapper"><img data-type="invalidSmall" style="display: none;" src="images/error_b.svg" alt="invalid" /></div>
+                                </td>
+                                <td>
+                                    <span class="infoSpan" style="padding-left: 4px;" data-type="txt_interval">days</span>
+                                </td>
+                            </tr>
+
+                        <!--                            
+                            <tr id="week_custom" style="display: none;">
+                                <td class="label repeat"><label data-type="week_custom_txt">On </label></td>
+                                <td colspan="2">
+                                    <table class="customTable customTableWeek">
+                                        <tr>
+                                            <td data-type="0" data-text="SU" class="firstCol">Su</td>
+                                            <td data-type="1" data-text="MO">Mo</td>
+                                            <td data-type="2" data-text="TU">Tu</td>
+                                            <td data-type="3" data-text="WE">We</td>
+                                            <td data-type="4" data-text="TH">Th</td>
+                                            <td data-type="5" data-text="FR">Fr</td>
+                                            <td data-type="6" data-text="SA" class="lastCol">Sa</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr id="month_custom1" style="display: none;">
+                                <td class="label"><label data-type="month_custom1_txt"></label></td>
+                                <td data-size="half">
+                                    <select id="repeat_month_custom_select" class="small">
+                                        <option value="every" data-type="month_custom_every">Every</option>
+                                        <option value="first" data-type="month_custom_first">First</option>
+                                        <option value="second" data-type="month_custom_second">Second</option>
+                                        <option value="third" data-type="month_custom_third">Third</option>
+                                        <option value="fourth" data-type="month_custom_fourth">Fourth</option>
+                                        <option value="fifth" data-type="month_custom_fifth">Fifth</option>
+                                        <option value="last" data-type="month_custom_last">Last</option>
+                                        <option value="custom" data-type="month_custom_custom">Custom</option>
+                                    </select>
+                                </td>
+                                <td style="position: relative;" data-size="half">
+                                    <select id="repeat_month_custom_select2" class="small">
+                                        <option value="SU" data-type="0">Sunday</option>
+                                        <option value="MO" data-type="1">Monday</option>
+                                        <option value="TU" data-type="2">Tuesday</option>
+                                        <option value="WE" data-type="3">Wednesday</option>
+                                        <option value="TH" data-type="4">Thursday</option>
+                                        <option value="FR" data-type="5">Friday</option>
+                                        <option value="SA" data-type="6">Saturday</option>
+                                        <option value="DAY" data-type="month_custom_month">Day of the month</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr id="month_custom2" style="display: none;">
+                                <td class="label repeat"><label data-type="month_custom2_txt">On days</label></td>
+                                <td colspan="2">
+                                    <table class="customTable customTableMonth">
+                                        <tr>
+                                            <td data-type="1" class="firstCol">1</td>
+                                            <td data-type="2">2</td>
+                                            <td data-type="3">3</td>
+                                            <td data-type="4">4</td>
+                                            <td data-type="5">5</td>
+                                            <td data-type="6">6</td>
+                                            <td data-type="7" class="lastCol">7</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-type="8" class="firstCol">8</td>
+                                            <td data-type="9">9</td>
+                                            <td data-type="10">10</td>
+                                            <td data-type="11">11</td>
+                                            <td data-type="12">12</td>
+                                            <td data-type="13">13</td>
+                                            <td data-type="14" class="lastCol">14</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-type="15" class="firstCol">15</td>
+                                            <td data-type="16">16</td>
+                                            <td data-type="17">17</td>
+                                            <td data-type="18">18</td>
+                                            <td data-type="19">19</td>
+                                            <td data-type="20">20</td>
+                                            <td data-type="21" class="lastCol">21</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-type="22" class="firstCol">22</td>
+                                            <td data-type="23">23</td>
+                                            <td data-type="24">24</td>
+                                            <td data-type="25">25</td>
+                                            <td data-type="26">26</td>
+                                            <td data-type="27">27</td>
+                                            <td data-type="28" class="lastCol">28</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-type="29" class="firstCol">29</td>
+                                            <td data-type="30">30</td>
+                                            <td data-type="31">31</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr id="year_custom2" style="display: none;">
+                                <td class="label"><label data-type="year_custom2"></label></td>
+                                <td data-size="half">
+                                    <select id="repeat_year_custom_select1" class="small">
+                                        <option value="every" data-type="year_custom_every">Every</option>
+                                        <option value="first" data-type="year_custom_first">First</option>
+                                        <option value="second" data-type="year_custom_second">Second</option>
+                                        <option value="third" data-type="year_custom_third">Third</option>
+                                        <option value="fourth" data-type="year_custom_fourth">Fourth</option>
+                                        <option value="fifth" data-type="year_custom_fifth">Fifth</option>
+                                        <option value="last" data-type="year_custom_last">Last</option>
+                                        <option value="custom" data-type="year_custom_custom">Custom</option>
+                                    </select>
+                                </td>
+                                <td style="position: relative;" data-size="half">
+                                    <select id="repeat_year_custom_select2" class="small">
+                                        <option value="SU" data-type="0">Sunday</option>
+                                        <option value="MO" data-type="1">Monday</option>
+                                        <option value="TU" data-type="2">Tuesday</option>
+                                        <option value="WE" data-type="3">Wednesday</option>
+                                        <option value="TH" data-type="4">Thursday</option>
+                                        <option value="FR" data-type="5">Friday</option>
+                                        <option value="SA" data-type="6">Saturday</option>
+                                        <option value="DAY" data-type="year_custom_month">Day of the month</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr id="year_custom1" style="display: none;">
+                                <td class="label repeat"><label data-type="year_custom1">Every</label></td>
+                                <td colspan="2">
+                                    <table class="customTable customTableMonth">
+                                        <tr>
+                                            <td data-type="1" class="firstCol">1</td>
+                                            <td data-type="2">2</td>
+                                            <td data-type="3">3</td>
+                                            <td data-type="4">4</td>
+                                            <td data-type="5">5</td>
+                                            <td data-type="6">6</td>
+                                            <td data-type="7" class="lastCol">7</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-type="8" class="firstCol">8</td>
+                                            <td data-type="9">9</td>
+                                            <td data-type="10">10</td>
+                                            <td data-type="11">11</td>
+                                            <td data-type="12">12</td>
+                                            <td data-type="13">13</td>
+                                            <td data-type="14" class="lastCol">14</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-type="15" class="firstCol">15</td>
+                                            <td data-type="16">16</td>
+                                            <td data-type="17">17</td>
+                                            <td data-type="18">18</td>
+                                            <td data-type="19">19</td>
+                                            <td data-type="20">20</td>
+                                            <td data-type="21" class="lastCol">21</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-type="22" class="firstCol">22</td>
+                                            <td data-type="23">23</td>
+                                            <td data-type="24">24</td>
+                                            <td data-type="25">25</td>
+                                            <td data-type="26">26</td>
+                                            <td data-type="27">27</td>
+                                            <td data-type="28" class="lastCol">28</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-type="29" class="firstCol">29</td>
+                                            <td data-type="30">30</td>
+                                            <td data-type="31">31</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr id="year_custom3" style="display: none;">
+                                <td class="label repeat"><label data-type="year_custom3">Of</label></td>
+                                <td colspan="2">
+                                    <table class="customTable customTableYear">
+                                        <tr>
+                                            <td data-type="0" data-text="jan" class="firstCol">Jan</td>
+                                            <td data-type="1" data-text="feb">Feb</td>
+                                            <td data-type="2" data-text="mar">Mar</td>
+                                            <td data-type="3" data-text="apr" class="lastCol">Apr</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-type="4" data-text="may" class="firstCol">May</td>
+                                            <td data-type="5" data-text="jun">Jun</td>
+                                            <td data-type="6" data-text="jul">Jul</td>
+                                            <td data-type="7" data-text="aug" class="lastCol">Aug</td>
+                                        </tr>
+                                        <tr>
+                                            <td data-type="8" data-text="sep" class="firstCol">Sep</td>
+                                            <td data-type="9" data-text="oct">Oct</td>
+                                            <td data-type="10" data-text="nov">Nov</td>
+                                            <td data-type="11" data-text="dec" class="lastCol">Dec</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr> -->
+                            <!-- <tr id="repeat_details" style="display: none;">
+                                <td class="label repeat"><label data-type="repeat_end"  for="repeat_end_details">end: </label></td>
+                                <td data-size="half">
+                                    <select class="small" id="repeat_end_details">
+                                        <option data-type="repeat_details_on_date" value="on_date">on date</option>
+                                        <option data-type="repeat_details_after" value="after">occurrences</option>
+                                        <option data-type="repeat_details_never" value="never">never</option>
+                                    </select>
+                                </td>
+                                <td style="position: relative;">
+                                    <input class="date small" type="text" data-type="PH_until_date" placeholder="Date until" name="end" id="repeat_end_date" />
+                                    <input style="display: none;" class="small" type="text" data-type="PH_repeat_count" placeholder="Repeat count" name="end" id="repeat_end_after" />
+                                    <div class="invalidWrapper"><img data-type="invalidSmall" style="display: none;" src="images/error_b.svg" alt="invalid" /></div>
+                                </td>
+                            </tr> 
+                        -->
+
+                            <tr>
+                                <td class="label"><label data-type="status" for="status">status: </label></td>
+                                <td colspan="2" data-size="full">
+                                    <select class="long" name="status" id="status">
+                                        <option data-type="STATUS_NONE" value="NONE">undefined</option>
+                                        <option data-type="STATUS_TENTATIVE" value="TENTATIVE">tentative</option>
+                                        <option data-type="STATUS_CONFIRMED" value="CONFIRMED">confirmed</option>
+                                        <option data-type="STATUS_CANCELLED" value="CANCELLED">canceled</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr class="row_avail">
+                                <td class="label"><label data-type="txt_avail" for="avail">availability: </label></td>
+                                <td colspan="2" data-size="full">
+                                    <select class="long" data-type="avail" name="avail" id="avail">
+                                        <option data-type="BUSY_AVAIL" value="busy">busy</option>
+                                        <option data-type="FREE_AVAIL" value="free">free</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr class="row_type">
+                                <td class="label"><label data-type="txt_type" for="type">privacy: </label></td>
+                                <td colspan="2" data-size="full">
+                                    <select class="long" data-typ_list-color2e="type" name="type" id="type">
+                                        <option data-type="PUBLIC_TYPE" value="public">public</option>
+                                        <option data-type="CONFIDENTIAL_TYPE" value="confidential">confidential</option>
+                                        <option data-type="PRIVATE_TYPE" value="private">private</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label"><label data-type="priority" for="priority">priority: </label></td>
+                                <td colspan="2" data-size="full">
+                                    <select class="long " name="priority" id="priority">
+                                        <option data-type="priority_none" value="0">none</option>
+                                        <option data-type="priority_low" value="9">low</option>
+                                        <option data-type="priority_medium" value="5">medium</option>
+                                        <option data-type="priority_high" value="1">high</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            
+                            <tr data-id="1">
+                                <td class="label"><label data-type="alert" for="alert">alert: </label></td>
+                                <td colspan="2" data-size="full">
+                                    <select class="long alert" name="alert_type" data-id="1" id="alert">
+                                        <option data-type="alert_none" value="none">none</option>
+                                        <option data-type="alert_message" value="message">message</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr data-id="1" class="alert_details" style="display: none;">
+                                <td class="label"></td>
+                                <td colspan="2" data-size="full">
+                                    <select class="long alert_message_details" name="alert_details" data-id="1">
+                                        <option data-type="on_date" value="on_date">on date</option>
+                                        <option data-type="weeks_before" value="weeks_before">weeks before</option>
+                                        <option data-type="days_before" value="days_before">days before</option>
+                                        <option data-type="hours_before" value="hours_before">hours before</option>
+                                        <option data-type="minutes_before" value="minutes_before">minutes before</option>
+                                        <option data-type="seconds_before" value="seconds_before">seconds before</option>
+                                        <option data-type="weeks_after" value="weeks_after">weeks after</option>
+                                        <option data-type="days_after" value="days_after">days after</option>
+                                        <option data-type="hours_after" value="hours_after">hours after</option>
+                                        <option data-type="minutes_after" value="minutes_after">minutes after</option>
+                                        <option data-type="seconds_after" value="seconds_after">seconds after</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr data-id="1" class="alert_message_date" style="display: none;">
+                                <td class="label"></td>
+                                <td>
+                                    <input class="small before_after_input" type="text" data-type="PH_before_after_alert" placeholder="Value" data-id="1" style="display: none;" />
+                                    <input class="date small message_date_input" type="text" data-type="PH_alarm_date" placeholder="Alarm date" data-id="1" />
+                                    <div class="invalidWrapper"><img data-type="invalidSmall" data-id="1" style="display: none;" src="images/error_b.svg" alt="invalid" /></div>
+                                </td>
+                                <td>
+                                    <input class="time small message_time_input" type="text" data-type="PH_alarm_time" placeholder="Alarm time" data-id="1" />
+                                    <div class="invalidWrapper"><img data-type="invalidSmall" data-id="1" style="display: none;" src="images/error_b.svg" alt="invalid" /></div>
+                                </td>
+                            </tr>
+                        </table>
+                        
+                        <div class="eventButtons">
+                            <input id="show" type="hidden" value=""/>
+                            <input id="uid" type="hidden" value=""/>
+                            <input id="etag" type="hidden" value=""/>
+                            <input id="repeatCount" type="hidden" value=""/>
+                            <input id="repeatEvent" type="hidden" value=""/>
+                            <input id="recurrenceID" type="hidden" value=""/>
+                            <input id="futureStart" type="hidden" value=""/>
+                            <input id="vcalendarHash" type="hidden" value=""/>
+                            <input id="vcalendarUID" type="hidden" value=""/>
+                            <input id="editButton" type="button" value="Edit" data-type="edit" onclick="startEditModeEvent();" />
+                            <input id="duplicateButton" type="button" value="Duplicate" data-type="duplicate" onclick="duplicateEvent('')" />
+                            <input id="editOptionsButton" type="button" value="edit repeat" data-type="editOptions" />
+                            <!-- <input id="resetButton" type="button" value="Reset" data-type="reset" /> -->
+                            <input id="saveButton" type="submit" value="Save" data-type="save" onclick="updateEventFormDimensions(true);save();" />
+                            <input id="closeButton" type="button" value="Cancel" data-type="cancel" />
+                            <input id="deleteButton" type="button" value="Delete" data-type="delete" onclick="updateEventFormDimensions(true);deleteEvent();" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- templates -->
+    <template id="alert-comp-tmpl">
+        <div
+            class   = "alertContainer"
+            v-show  = "isShow"
+            transition = "fade"
+            role = "alert">
+
+            <!-- 右上角关闭按钮 -->
+            <span 
+                class = "close"
+                @click = "isShow = false">
+                &times;
+            </span>
+
+            <slot></slot>
+        </div>
+    </template>
+
+    <template id="time-count-comp-tmpl">
+        <!-- 天和小时选择的模板：包括一个input，和增加减少的两个按钮 -->
+        <div class="timeWrapper">
+            <div class="timeCenter">
+                <input v-model="count | numberDisplay" lazy number>
+                <span class="timeUp" @click = "addTime"></span>
+                <span class="timeDown" @click = "count>0 ? count-- : count"></span>
+            </div>
+            <span>{{time_txt}}</span>
+        </div>
+    </template>
+    <!-- templates over -->
+
+    <!-- scripts -->
+    <script src="lib/vue_dev.js" type="text/javascript"></script>
+    <script src="js/cache_handler.js" type="text/javascript"></script>
+    <script src="lib/jquery-2.1.3.min.js" type="text/javascript"></script>
+    <script src="lib/jquery.cookie.js" type="text/javascript"></script>
+    <script src="lib/jquery.mCustomScrollbar.concat.min.js" type="text/javascript"></script>
+    <script src="lib/jquery.browser.js" type="text/javascript"></script>
+    <script src="lib/jquery.autosize.js" type="text/javascript"></script>
+    <script src="lib/jquery-ui-1.11.2.custom.js" type="text/javascript"></script>
+    <script src="lib/jquery.quicksearch.js" type="text/javascript"></script>
+    <script src="lib/jquery.placeholder-1.1.9.js" type="text/javascript"></script>
+    <script src="lib/jshash-2.2_sha256.js" type="text/javascript"></script>
+    <script src="lib/spectrum.js" type="text/javascript"></script>
+    <script src="lib/fullcalendar.js" type="text/javascript"></script>
+    <script src="js/vue_comps.js" type="text/javascript"></script>
+    <script src="js/config.js" type="text/javascript"></script>
+    <script src="js/common.js" type="text/javascript"></script>
+    <script src="js/webdav_protocol.js" type="text/javascript"></script>
+    <script src="js/localization.js" type="text/javascript"></script>
+    <script src="js/interface.js" type="text/javascript"></script>
+    <script src="js/vcalendar_rfc_regex.js" type="text/javascript"></script>
+    <script src="js/resource.js" type="text/javascript"></script>
+    <script src="js/vcalendar.js" type="text/javascript"></script>
+    <script src="js/vtodo.js" type="text/javascript"></script>
+    <script src="js/data_process.js" type="text/javascript"></script>
+    <script src="js/main.js" type="text/javascript"></script>
+    <script src="js/forms.js" type="text/javascript"></script>
+    <script src="js/timezones.js" type="text/javascript"></script>
+    <script src="js/users_data.js" type="text/javascript"></script>
+    <script src="lib/Math.uuid.js" type="text/javascript"></script>
+</body>
+</html>
+
+
+

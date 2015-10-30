@@ -1,0 +1,170 @@
+@charset "utf-8";
+/*--公用--*/
+li {
+  list-style: none;
+}
+html,
+body,
+#vue_comps {
+  width: 100%;
+  height: 100%;
+}
+.modalDisable {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+/*--弹出提醒--*/
+#AlertWrapper {
+  /*所有右侧弹出提醒对话框的容器*/
+  position: absolute;
+  top: 47px;
+  right: 50px;
+  width: 300px;
+  height: 100%;
+  z-index: 30;
+}
+.alertContainer {
+  width: 280px;
+  margin-bottom: 6px;
+  padding: 10px;
+  color: #3c763d;
+  border-radius: 8px;
+  background-color: #fbfbfb;
+  box-shadow: 0 0 10px #888;
+}
+.alertColor {
+  /*圆形日历颜色显示*/
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 5px 0 25px;
+  border-radius: 50%;
+  background-color: black;
+}
+.alertTitle {
+  /*提醒标题*/
+  font-size: 16px;
+  color: #555;
+}
+.alertDetail {
+  font-size: 14px;
+  /*提醒细节*/
+  display: block;
+  margin: 10px 0 5px 45px;
+  color: #999;
+}
+.close {
+  /*关闭按钮*/
+  font-size: 9px;
+  font-weight: bold;
+  line-height: 15px;
+  float: right;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  text-align: center;
+  color: #fff;
+  border-radius: 50%;
+  background-color: #c2c2c2;
+}
+.fade-transition {
+  transition: opacity .3s ease;
+}
+.fade-enter,
+.fade-leave {
+  opacity: 0;
+}
+/*--勾选全天时，设置提醒的弹出框--*/
+#allDayAlertSelect {
+  overflow: hidden;
+  position: absolute;
+  /*top: 376px; */
+  /*left: 120px;*/
+  z-index: 30;
+  margin: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding-top: 12px;
+  padding-bottom: 33px;
+  width: 240px;
+  background: #fff;
+}
+.allDayAlertSelect_content {
+  position: relative;
+  top: 1px;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 0 7% ;
+  width: 86%;
+}
+.allDayAlertSelect_content li {
+  position: relative;
+  top: 1px;
+  border-bottom: 1px solid #ccc;
+  padding-left: 30px;
+  height: 38px;
+  font-size: 17px;
+  line-height: 38px;
+  cursor: pointer;
+}
+.allDayAlertSelect_content li.active {
+  background: url(../images/spanbj-1.png) no-repeat 6px 9px;
+}
+.allDayAlertSelect_time {
+  /*display: none;*/
+  margin-top: 30px;
+  padding: 0 7%;
+  width: 86%;
+}
+.allDayAlertSelect_timeTXT {
+  position: absolute;
+  margin: 0 0 0 35px;
+}
+.timeWrapper {
+  float: left;
+  margin-right: 7px;
+  line-height: 30px;
+}
+.timeCenter {
+  float: left;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 60px;
+  height: 30px;
+  line-height: 30px;
+}
+.timeCenter span {
+  float: left;
+  position: relative;
+  top: -1px;
+  border-top: 1px solid #ccc;
+  width: 30%;
+  height: 15px;
+}
+.timeCenter input {
+  float: left;
+  border-radius: 5px;
+  width: 65%;
+  text-align: center;
+}
+.timeUp {
+  background: url(../images/headerBtnTop.png) no-repeat center center;
+}
+.timeDown {
+  background: url(../images/headerBtnBottom.png) no-repeat center center;
+}
+.allDayAlertSelect_time input {
+  border: none;
+  border-right: 1px solid #ccc;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  height: 100%;
+  text-align: center;
+  outline: none;
+}
+/*# sourceMappingURL=vue_comps.css.map */

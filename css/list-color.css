@@ -1,0 +1,887 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#listAdd,
+#listDelete,
+#listUnsubscribe {
+    text-align: center;
+
+    cursor: pointer;
+}
+
+.calendarliTemplate {
+    display: none;
+}
+
+li {
+    list-style: none;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+ul,
+p {
+    margin: 0;
+    padding: 0;
+}
+
+.list-content li {
+    list-style: none;
+
+    margin-top: 20px;
+    border: 1px solid #d0d0d0;
+    border-radius: 2px;
+    padding: 0 13px;
+    /*list-style: none;*/
+    height: 40px;
+
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 40px;
+
+    color: #535353;
+}
+
+.list-content li:first-child {
+    list-style: none;
+
+    margin-top: 1px;
+    border: 1px solid #d0d0d0;
+    border-radius: 2px;
+    height: 40px;
+}
+
+.list-content .liColor {
+    min-height: 90px;
+}
+
+.list-content li p {
+    border-bottom: 1px solid #d0d0d0;
+}
+
+.list-content .list-color span {
+    display: inline-block;
+    float: left;
+
+    margin-top: 15px;
+    margin-left: 20px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+
+    background: red;
+
+    cursor: pointer;
+}
+
+.list-strong strong {
+    float: left;
+    overflow: hidden;
+
+    width: 255px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.myListItem {
+    position: relative;
+}
+
+#list_MKCalendar,
+#list_EditCalendar,
+#list_ViewCalendar {
+    display: none;
+
+    left: 265px;
+}
+
+.list-strong-cont2 {
+    float: left;
+
+    width: 61%;
+}
+.list-box {
+    position: fixed;
+    top: 13px;
+    z-index: 30;
+
+    border: 1px solid #e2e2e2;
+    border-radius: 3px;
+    padding: 13px;
+    width: 324px;
+    height: 274px;
+
+    font-size: 15px;
+
+    color: #535353;
+    background: #fff;
+    background: #fff;
+
+    box-shadow: 1px 2px 32px #969696;
+}
+
+.list-img-btn {
+    float: right;
+
+    margin-top: 11px;
+    border: 1px solid #7b7b7b;
+    border-radius: 3px;
+    padding-right: 1px;
+    width: 15px;
+    height: 17px;
+
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 15px;
+    text-align: center;
+
+    color: #7d7d7d;
+}
+
+.list-content {
+    position: relative;
+}
+.list-cur {
+    position: absolute;
+    top: 20px;
+    left: -24px;
+    z-index: 9998;
+
+    width: 20px;
+    height: 20px;
+
+    background: #fff;
+
+    -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+    /*border-top:20px solid yellow;*/
+    /*border-right:20px solid blue;*/
+    /*border-bottom:20px solid yellow;*/
+}
+.list-color {
+    position: relative;
+}
+.list-spanCur {
+    position: absolute;
+    top: 26px;
+    left: 33px;
+
+    width: 16px;
+    height: 16px;
+
+    background: url("../images/spanbj-1.png")  no-repeat;
+}
+.ezz {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+
+    width: 100%;
+    height: 100%;
+
+    background: #fff;
+
+    opacity: 0;
+}
+
+#ResourceCalDAVList {
+    z-index: 24;
+}
+
+.settingContentContainer {
+    /*height: 260px;*/
+    padding: 10px 13px;/*!!!!!!!!!!!*/
+    width: 374px;/*!!!!!!!!!!!*/
+}
+.settingContainerThree {
+    margin: 10px 0 17px 0;
+    border: 1px solid #e1e1e1;
+    border-radius: 2px;
+
+    font-family: "Î¢ÈíÑÅºÚ";
+
+    background: url(../images/set1_1.gif) 342px 11px no-repeat;
+}
+.settingContainerThree.active {
+    background: none;
+}
+.settingContainerThree.cur {
+    background: url(../images/set1_1.gif) 342px 9px no-repeat ;
+}
+.settingContainerThree li {
+    overflow: hidden;
+
+    position: relative;
+    top: 1px;
+
+    border-bottom: 1px solid #e1e1e1;
+    padding: 8px 0;
+    width: 100%;
+}
+
+
+.rcyqul {
+    border-radius: 2px;
+    padding: 0 10px;
+
+    font-family: "Î¢ÈíÑÅºÚ";
+}
+.rcyqul.active {
+    background: none;
+}
+.rcyqul li.cur {
+    background: url(../images/set1_1.gif) 322px 9px no-repeat ;
+}
+.rcyqul li {
+    overflow: hidden;
+
+    position: relative;
+    top: 1px;
+
+    border-bottom: 1px solid #e1e1e1;
+    padding: 8px 0;
+    width: 100%;
+
+    background: url(../images/set1_1.gif) 335px 11px no-repeat ;
+
+    cursor: pointer;
+}
+
+.settingContentContainer li h6 {
+    float: left;
+
+    font-size: 16px;
+    font-weight: 100;
+}
+.settingContentContainer li div {
+    float: left;
+
+    position: relative;
+
+    border-left: 1px solid #e1e1e1;
+    padding-left: 20px;
+
+    color: #565656;
+    background: url(../images/set1_1.gif) 250px 3px no-repeat ;
+}
+
+
+.rcyqCenter li h6 {
+    float: left;
+
+    font-size: 16px;
+    font-weight: 100;
+}
+.rcyqCenter li div {
+    float: left;
+
+    position: relative;
+
+    border-left: 1px solid #e1e1e1;
+    padding-left: 20px;
+
+    color: #999;
+}
+.rcyqCenter .defaultCalendar {
+    width: 200px;
+}
+.rcyqCenter .defaultCalendar .rcyqP {
+    overflow: hidden;
+
+    width: 200px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: #999;
+}
+
+.settingContentContainer li div.setChoose-c-active {
+    border: 1px solid #fff;
+}
+.settingContentContainer li > h6 {
+    width: 84px;
+
+    text-align: center;
+
+    color: #565656;
+}/*!!!!!!!!!!!*/
+.settingContentContainer .setWidth66 {
+    width: 117px;
+}
+.settingContentContainer .setWidth67 {
+    width: 134px;
+}
+.setWidth33 {
+    width: 30%;
+}
+.setWidth66 {
+    width: 60%;
+}
+.settingWeekContainer,
+.settingHoursContainer {
+    display: none;
+}
+.setChoose {
+    display: inline-block;
+
+    position: relative;
+    top: 3px;
+
+    width: 18px;
+    height: 18px;
+
+    background: url(../images/set_choose2.gif) no-repeat;
+
+    cursor: pointer;
+}
+.setChoose.active {
+    background: url(../images/set_choose1.gif) no-repeat;
+}
+
+/*ºó¼Ó*/
+.god-set {
+    font-size: 16px;
+    line-height: 30px;
+    text-align: center;
+
+    color: #555;
+}
+
+.defaultCalendar {
+    width: 226px;
+
+    font-size: 16px;
+    line-height: 30px;
+    line-height: 21px;
+
+    color: #555;
+
+    cursor: pointer;
+}
+
+.defaultCalendar strong {
+    float: right;
+}
+
+.setWidthTime {
+    z-index: 29;
+
+    width: 234px;
+
+    cursor: pointer;
+}
+
+.defaultCalendar span {
+    display: inline-block;
+    float: left;
+
+    margin-top: 5px;
+    margin-right: 10px;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+
+    background: red;
+}
+
+.defaultCalendar p {
+    display: inline-block;
+    float: left;
+    overflow: hidden;
+    overflow: hidden;
+
+    width: 128px;
+    height: 20px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.settingMy {
+    display: none;
+    overflow-y: hidden;
+
+    position: absolute;
+    top: 38px;
+    right: -1px;
+    z-index: 30;
+
+    border: 1px solid #ccc;
+    padding: 0 15px;
+    width: 258px;
+    max-height: 300px;
+
+    background: #fff;
+    background: #fff;
+}
+.settingMy li {
+    top: 0;
+    z-index: 30;
+
+    cursor: pointer;
+}
+.settingMy li p {
+    float: left;;
+}
+.settingMy li span {
+    display: inline-block;
+    float: left;
+
+    margin-top: 5px;
+    margin-right: 10px;
+    margin-left: 5px;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+
+    background: red;
+}
+.settingMy li strong {
+    float: right;
+
+    font-weight: 100;
+}
+.settingMy li strong.active {
+    background: url("../images/spanbj-1.png")  no-repeat center ;
+}
+.settingMy li .Mycho {
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;;
+}
+/*start end*/
+
+.list-strong-cont {
+    float: left;
+
+    width: 61%;
+}
+
+.list-content .list-strong p {
+    float: left;
+
+    margin-top: 6px;
+    margin-right: 25px;
+    border-right: 1px solid #ccc;
+    border-bottom: none;
+    width: 26%;
+    height: 30px;
+
+    line-height: 30px;
+}
+
+.list-content .list-Owner p {
+    float: left;
+
+    margin-top: 6px;
+    margin-right: 25px;
+    border-bottom: none;
+    width: 26%;
+    height: 30px;
+
+    line-height: 30px;
+}
+
+.list-content .list-Owner span {
+    float: right;
+
+    margin-top: 6px;
+    border-bottom: none;
+    height: 30px;
+
+    font-size: 16px;
+    line-height: 30px;
+
+    color: #999;
+
+    cursor: pointer;
+}
+
+.list-strong-cont div {
+    float: left;
+
+    width: 50%;
+}
+.list-strong-cont2 div {
+    float: left;
+
+    width: 50%;
+}
+
+.list-box .list_txt {
+    overflow: hidden;
+
+    margin-top: 6px;
+    width: 100%;
+
+    font-size: 18px;
+    font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: #484848;
+}
+
+
+/*header btn*/
+.headerBtn {
+    padding-right: 30px;
+
+    font-size: 18px;
+    line-height: 50px;
+    text-align: left;
+
+    color: #4bcc0d;
+    background: url(../images/headerBtnTop.png) no-repeat right center;
+}
+.headerBtn:hover {
+    padding-right: 30px;
+
+    font-size: 18px;
+    line-height: 50px;
+    text-align: left;
+
+    color: #4bcc0d;
+    background: url(../images/headerBtnBottom.png) no-repeat right center;
+}
+
+/*nodayalert*/
+.noDay {
+    display: none;
+    overflow: hidden;
+
+    position: fixed ;
+    top: 45%;
+    left: 46%;
+    z-index: 30;
+
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding-top: 12px;
+    width: 240px;
+
+    background-color: #fff;
+}
+.noDayContent {
+    display: inline-block;
+
+    border-top: 1px solid #ccc;
+    padding: 0 7% ;
+    width: 86%;
+
+    cursor: pointer;
+}
+.noDayContent li {
+    position: relative;
+    top: 1px;
+
+    border-bottom: 1px solid #ccc;
+    padding-left: 30px;
+    height: 38px;
+
+    font-size: 17px;
+    line-height: 38px;
+}
+.noDayContent li.active {
+    background: url(../images/spanbj-1.png) no-repeat 6px 9px;
+}
+
+/*右面详情日历的提示，，在2.1设计稿中*/
+
+.setting-content {
+    display: none;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 26;
+
+    margin-top: -160px;
+    margin-left: -210px;
+    /*height: 278px;*/
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 400px;/*!!!!!!!!!!!*/
+
+    font-size: 16px;
+
+    background: #fff;
+}
+.cccc {
+    display: block;
+
+    margin-left: 20px;
+    border-right: 1px solid #ccc;
+    width: 80px;
+
+    font-size: 14px;
+    line-height: 40px;
+}
+.btnouter span {
+    floct: left;
+}
+
+
+#eventDetailsTable {
+    position: relative;
+}
+
+.timeall {
+    float: right;
+}
+
+.timeall span {
+    display: inline;
+}
+
+
+
+/*我的日历详情开始*/
+.groupDate {
+    overflow: hidden;
+
+    margin-bottom: 4px;
+    border-bottom: 1px solid #ccc;
+    padding: 0 20px;
+}
+.groupDate p {
+    display: block;
+    float: left;
+
+    width: 100%;
+
+    font-size: 18px;
+    font-weight: 600;
+}
+.dateCount {
+    font-size: 20px;
+
+    color: #8e8e8e;
+}
+.groupDate h6 {
+    display: block;
+    float: left;
+
+    font-size: 18px;
+}
+.groupDate span {
+    float: right ;
+
+    margin-bottom: 3px;
+}
+.group .setWidth66 {
+    width: 85px;
+}
+.rightno span {
+    float: left;
+
+    border-radius: 3px;
+    padding: 5px 15px;
+
+    background: #ccc;
+}
+.rightno strong {
+    float: right;
+
+    color: #27c006;
+}
+.pos_set_yaoqing {
+    position: relative;
+}
+.yaoqingren1 {
+    position: absolute;
+    top: 1px;
+    left: -268px;
+
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 13px;
+    padding-top: 7px;
+    width: 230px;
+
+    background: #fff;
+}
+.yaoqingren1 div {
+    overflow: hidden;
+
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    width: 228px;
+
+    background: url(../images/set1_1.gif) 202px 11px no-repeat;
+}
+.yaoqingren1 div.weixiangying {
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    width: 228px;
+    height: none;
+
+    background: url(../images/set1_1.gif) 202px 11px no-repeat;
+}
+.yaoqingren1 p {
+    margin-bottom: 5px;
+    padding-left: 20px;
+
+    line-height: 30px;
+}
+.yaoqingren1 img {
+    float: left;
+
+    margin: 9px;
+}
+.yaoqingren1 strong img {
+    float: left;
+
+    margin: 9px;
+    margin-left: 0;
+}
+.yaoqingren1 span {
+    float: left;
+
+    line-height: 39px;
+}
+.yaoqingren1 strong {
+    display: block;
+    overflow: hidden;
+
+    position: relative;
+    bottom: -1px;
+
+    margin-left: 9px;
+    border-bottom: 1px solid #ccc;
+    width: 210px;
+
+    background: url(../images/set1_1.gif) 192px 11px no-repeat;
+}
+.addbeiyaoqingren {
+    height: 41px;
+}
+.addbeiyaoqingren .inp1 {
+    border: none;
+    padding-left: 20px;
+
+    line-height: 40px;
+
+    outline: none;
+}
+.addbeiyaoqingren .inp2 {
+    border-radius: 3px;
+    width: 20px;
+    height: 20px;
+
+    outline: none;
+}
+/*我的日历详情结束*/
+
+
+
+
+/*联系人页面开始*/
+.lianxi {
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 400px;
+}
+.searchli {
+    border: none;
+    border-radius: 5px;
+    width: 374px;
+    height: 40px;
+
+    line-height: 35px;
+
+    outline: none;;
+}
+.borderSpan {
+    display: block;
+
+    border: 1px solid #ccc;
+}
+.geren .mylianxi li {
+    border-bottom: 1px solid #ccc;
+    padding-left: 30px;
+
+    line-height: 38px;
+
+    background: url(images/set_choose2.gif) no-repeat 1px 10px;
+}
+.geren .mylianxi li.active {
+    background: url(images/spanbj-1.png) no-repeat 1px 10px;
+}
+.lianxitimu {
+    display: block;
+
+    margin-top: 10px;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding-left: 30px;
+    height: 30px;
+
+    line-height: 30px;
+
+    background: url(images/btn_arrow_prev.png) no-repeat 1px 8px;
+}
+.qiye .lianxitimu {
+    border-top: none;
+}
+.mylianxi img {
+    float: right;
+
+    margin-top: 8px;
+}
+.lingdao strong {
+    padding-left: 40px;;
+}
+.qiye .mylianxi li {
+    border-bottom: 1px solid #ccc;
+    padding-left: 30px;
+
+    line-height: 38px;
+
+    background: url(images/set_choose2.gif) no-repeat 35px 10px;
+}
+.qiye .mylianxi .bj_span {
+    padding-left: 40px;
+
+    background: url(images/btn_arrow_next.png) no-repeat 1px 10px;
+}
+.qieye_list li {
+    border-bottom: 1px solid #ccc;
+    padding-left: 50px;
+
+    line-height: 38px;
+
+    background: url(images/btn_arrow_next.png) no-repeat 34px 10px;
+}
+
+/*结束*/
+
+#index_form {
+    position: relative;
+}
+
+.ero_tixing {
+    display: none;
+
+    position: absolute;
+    top: 142px;
+    left: 1px;
+
+    padding-left: 30px;
+
+    font-size: 16px;
+
+    color: #fff;
+    background: url(../images/denglu.png) no-repeat ;
+}

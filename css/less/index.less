@@ -1,0 +1,138 @@
+@charset "utf-8";
+@import "z";
+@import "css3";
+
+// --首页--
+// --变量--
+	@wrapper_w: 360px;
+	@logo_mt: 118px;
+	@logo_mb: 28px;
+	@logo_w: 140px;
+	@title_s: 28px;
+	@form_mt: 60px;
+	@btn_h: 60px;
+	@icon_mtb: 18px;
+	@icon_plr: 15px;
+	@input_r: 5px;
+	@loginkeep_mtb: 20px;
+	@input_font_s: 20px;
+	@loginkeep_font_s: 16px;
+	@login_font_s: 24px;
+	@link_oa_mt: 20px;
+	@link_oa_mb: 127px;
+	@link_oa_font_s: 16px;
+
+	@icon_bc: #dcdcdc;
+	@input_bc: #26c946;
+	@login_bgc: #25ca45;
+	@login_bgc_hover: #22be40;
+	@link_oa_c: #999;
+	@link_oa_c_hover: #26c946;
+
+#LoginPage {
+	// 背景图片
+	.bg-m("../images/index_bg.png", 0, 0);
+	.background-size(cover);
+}
+
+#index_wrapper {
+	.bc-d(@wrapper_w);
+}
+
+#index_logo {
+	// logo
+	margin: @logo_mt (@wrapper_w - @logo_w)/2 @logo_mb;
+}
+
+.index_title {
+	.font-s(@title_s);
+	color: #fff;
+	margin: 0 (@wrapper_w - 168)/2;
+}
+
+#index_form {
+	margin: @form_mt 0 0;
+}
+
+#username, #password, #login_btn {
+	width: 100%;
+	height: @btn_h;
+	border: 0;
+	padding: 0;
+	.d-b();
+}
+
+.icon_wrapper {
+	.abs();
+	height: 26px;
+	margin: @icon_mtb 0;
+	padding: 0 @icon_plr;
+	border-right: 1px solid @icon_bc;
+}
+
+#username, #password {
+	.font-s(@input_font_s);
+	text-indent: 80px;
+	.l-h(@btn_h);
+	
+	&:focus {
+		outline: none;
+		box-shadow: 0 0 0 1px @input_bc;
+	}
+}
+
+#username {
+	.border-top-left-radius(@input_r);
+	.border-top-right-radius(@input_r);
+}
+#password {
+	margin-top: 1px;
+	.border-bottom-left-radius(@input_r);
+	.border-bottom-right-radius(@input_r);
+}
+
+#usr_icon {
+	// 用户名图标
+}
+
+#psd_icon {
+	// 密码的图标
+	margin: 5px 0;
+}
+
+.login_keep {
+	margin: @loginkeep_mtb 0;
+	.font-s(@loginkeep_font_s);
+	.fr();
+	color: #fff;
+
+	input {
+		width: 18px;
+		height: 18px;
+		.abs();
+		margin: 3px 0 0 -30px;
+	}
+}
+
+#login_btn {
+	.border-radius(@input_r);
+	background: @login_bgc;
+	color: #fff;
+	.font-s(@login_font_s);
+
+	&:hover {
+		background: @login_bgc_hover;
+	}
+}
+
+.link_to_oa {
+	margin: @link_oa_mt 52px @link_oa_mb;
+	color: @link_oa_c;
+
+	a {
+		color: @link_oa_c;
+		&:hover {
+			color: @link_oa_c_hover;
+		}
+	}
+}
