@@ -9,6 +9,6 @@ Contrary to [caldavzap](http://www.inf-it.com/caldavzap/), we focused on best us
     5. a event invited
     6. notification
  
- Now, we are refactoring it by working with vue.js and React
+ Now, we are refactoring it by working with vue.js
  
  
