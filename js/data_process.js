@@ -595,148 +595,6 @@ function applyTimezone(previousTimezone, isEventLocal) {
             }, 10, i);
         }
     }
-
-    for (var i = 0; i < todoCollections.length; i++) {
-        if (todoCollections[i].uid != undefined) {
-            setTimeout(function(i) {
-                for (var j = 0; j < todosArray[todoCollections[i].uid].length; j++) {
-                    if (todosArray[todoCollections[i].uid][j].start) {
-                        if (typeof todosArray[todoCollections[i].uid][j].start == 'string') {
-                            todosArray[todoCollections[i].uid][j].start = $.fullCalendar.parseDate(todosArray[todoCollections[i].uid][j].start);
-                        }
-                        var dateStart = todosArray[todoCollections[i].uid][j].start;
-                        var previousOffset = getOffsetByTZ(previousTimezone, dateStart)
-                            .getSecondsFromOffset();
-
-                        var actualOffset = '';
-                        if (typeof globalSessionTimeZone != 'undefined' &&
-                            globalSessionTimeZone != null &&
-                            globalSessionTimeZone != '') {
-
-                            actualOffset = getOffsetByTZ(globalSessionTimeZone, dateStart)
-                                .getSecondsFromOffset();
-                        } else {
-                            actualOffset = dateStart.getTimezoneOffset() * 60 * -1;
-                        }
-                        var intOffset = (actualOffset - previousOffset) * 1000;
-                        todosArray[todoCollections[i].uid][j].start.setTime(todosArray[todoCollections[i].uid][j].start.getTime() + intOffset);
-                    }
-
-                    if (todosArray[todoCollections[i].uid][j].end) {
-                        if (typeof todosArray[todoCollections[i].uid][j].end == 'string') {
-                            todosArray[todoCollections[i].uid][j].end = $.fullCalendar.parseDate(todosArray[todoCollections[i].uid][j].end);
-                        }
-                        var dateEnd = todosArray[todoCollections[i].uid][j].end;
-                        var previousOffset = getOffsetByTZ(previousTimezone, dateEnd).getSecondsFromOffset();
-                        var actualOffset = '';
-
-                        if (typeof globalSessionTimeZone != 'undefined' &&
-                            globalSessionTimeZone != null &&
-                            globalSessionTimeZone != '') {
-
-                            actualOffset = getOffsetByTZ(globalSessionTimeZone, dateEnd).getSecondsFromOffset();
-                        } else {
-                            actualOffset = dateEnd.getTimezoneOffset() * 60 * -1;
-                        }
-
-                        if (typeof isEventLocal != 'undefined') {
-                            actualOffset = getOffsetByTZ(todosArray[todoCollections[i].uid][j].timeZone, dateStart).getSecondsFromOffset();
-                        }
-
-                        if (typeof isEventLocal != 'undefined' && !isEventLocal) {
-                            var intOffset = (previousOffset - actualOffset) * 1000;
-                        } else {
-                            var intOffset = (actualOffset - previousOffset) * 1000;
-                        }
-                        todosArray[todoCollections[i].uid][j].end.setTime(todosArray[todoCollections[i].uid][j].end.getTime() + intOffset);
-                    }
-
-                    var todoEvent = todosArray[todoCollections[i].uid][j];
-                    if (j == 0 || j > 0 && todosArray[todoCollections[i].uid][j].id != todosArray[todoCollections[i].uid][j - 1].id) {
-                        if (todoEvent.alertTime.length > 0) {
-                            if (todoEvent.end) {
-                                var showDate = new Date(todoEvent.end.getTime());
-                            } else if (todoEvent.start) {
-                                var showDate = new Date(todoEvent.start.getTime());
-                            } else {
-                                var showDate = new Date();
-                            }
-                            for (var k = 0; k < todoEvent.alertTimeOut.length; k++) {
-                                clearTimeout(todoEvent.alertTimeOut[k]);
-                            }
-
-                            var aTime = '',
-                                now = '';
-
-                            for (var alarmIterator = 0; alarmIterator < todoEvent.alertTime.length; alarmIterator++) {
-                                if (todoEvent.alertTime[alarmIterator].charAt(0) == '-' ||
-                                    todoEvent.alertTime[alarmIterator].charAt(0) == '+') {
-
-                                    aTime = showDate.getTime();
-                                    var dur = parseInt(todoEvent.alertTime[alarmIterator].substring(1, todoEvent.alertTime[alarmIterator].length - 1));
-
-                                    if (todoEvent.alertTime[alarmIterator].charAt(0) == '-') {
-                                        aTime = aTime - dur;
-                                    } else {
-                                        aTime = aTime + dur;
-                                    }
-
-                                    now = new Date();
-                                } else {
-                                    var previousOffset = getOffsetByTZ(previousTimezone, $.fullCalendar.parseDate(todoEvent.alertTime[alarmIterator])).getSecondsFromOffset();
-                                    var actualOffset = '';
-                                    if (typeof globalSessionTimeZone != 'undefined' &&
-                                        globalSessionTimeZone != null &&
-                                        globalSessionTimeZone != '') {
-
-                                        actualOffset = getOffsetByTZ(globalSessionTimeZone, $.fullCalendar.parseDate(todoEvent.alertTime[alarmIterator])).getSecondsFromOffset();
-                                    } else {
-                                        actualOffset = $.fullCalendar.parseDate(todoEvent.alertTime[alarmIterator]).getTimezoneOffset() * 60 * -1;
-                                    }
-
-                                    if (typeof isEventLocal != 'undefined') {
-                                        actualOffset = getOffsetByTZ(todosArray[todoCollections[i].uid][j].timeZone, $.fullCalendar.parseDate(todoEvent.alertTime[alarmIterator])).getSecondsFromOffset();
-                                    }
-
-                                    if (typeof isEventLocal != 'undefined' && !isEventLocal) {
-                                        var intOffset = (previousOffset - actualOffset) * 1000;
-                                    } else {
-                                        var intOffset = (actualOffset - previousOffset) * 1000;
-                                    }
-
-                                    aTime = new Date($.fullCalendar.parseDate(todoEvent.alertTime[alarmIterator]).getTime() + intOffset);
-                                    todosArray[todoCollections[i].uid][j].alertTime[alarmIterator] = $.fullCalendar.formatDate(aTime, "yyyy-MM-dd HH:mm:ss");
-                                    now = new Date();
-                                }
-
-                                if (aTime > now) {
-                                    var delay = aTime - now;
-                                    if (maxAlarmValue < delay) {
-                                        delay = maxAlarmValue;
-                                    }
-                                    todosArray[todoCollections[i].uid][j].alertTimeOut[alarmIterator] = setTimeout(function() {
-                                        showAlertEvents(todoEvent.id, (aTime - now), {
-                                            start: showDate,
-                                            allDay: todoEvent.allDay,
-                                            title: todoEvent.title
-                                        });
-                                    }, delay);
-                                }
-                            }
-                        }
-                    }
-                }
-                todoCounter++;
-                if (todoCounter == todoCount) {
-                    refetchTodoEvents();
-                    todosDone = true;
-                    if (eventsDone) {
-                        $('#MainLoader').hide();
-                    }
-                }
-            }, 10, i);
-        }
-    }
 }
 
 function getLocalOffset(date) {
@@ -1289,7 +1147,7 @@ function dataToVcalendar (operation, accountUID, inputUID, inputEtag, delUID, is
     //      delUID, 
     //      isFormHidden, 
     //      deleteMode, 
-    //      attendees: 被邀请人数组，其值为 globalUsersData 中的下标；
+    //      attendees: 被邀请人数组，其值为 globalUserData 中的下标；
     // 输出：
 
     var vevent        = false;
@@ -1769,7 +1627,7 @@ function dataToVcalendar (operation, accountUID, inputUID, inputEtag, delUID, is
     }
     
     if (vevent) {
-        if ($('#repeat').val() != 'no-repeat') {
+        if (($('#repeat').val() != 'no-repeat')&&($('#repeatEvent').val()!="false")) {
             var interval = $("#repeat_interval_detail").val();
             var byDay = '';
             var monthDay = '';
@@ -2207,15 +2065,16 @@ function dataToVcalendar (operation, accountUID, inputUID, inputEtag, delUID, is
     }
 
     // 新增事件邀请他人功能，通过新增参数 attendees（数组）来实现。
-    if (attendees.length > 0) {
+    if (attendees && attendees.length > 0) {
         vCalendarText += "ORGANIZER:urn:x-uid:" + globalAccountSettings[0].cahref.slice(-37,-1) + "\n";
         // vCalendarText += "ORGANIZER;" + ":MAILTO:user07@example.com\n";
         vCalendarText += "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=CHAIR;PARTSTAT=ACCEPTED:urn:x-uid:" + 
                             globalAccountSettings[0].cahref.slice(-37,-1) + "\n";
 
         for (var i = 0; i < attendees.length; i++) {
+            var userNum = attendees[i]; // 将 uid 改为下标
             vCalendarText += "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION:MAILTO:" + 
-                                globalUsersData[attendees[i]].e_mail + "\n";    
+                                globalUserData[userNum].e_mail + "\n";    
         }
     }
 
@@ -2515,15 +2374,19 @@ function dataToVcalendar (operation, accountUID, inputUID, inputEtag, delUID, is
         vCalendarText += process_elem;
     }
 
-    if ($('#recurrenceID').val() == '')
+    if ($('#recurrenceID').val() == '') {
         var checkVal = 'orig';
-    else
+    }
+    else {
         var checkVal = $('#recurrenceID').val();
+    }
 
     if (typeof vCalendar.tplM['unprocessedVEVENT'] != 'undefined' && vCalendar.tplM['unprocessedVEVENT'] != null) {
-        for (vev in vCalendar.tplM['unprocessedVEVENT'])
-            if (vev == checkVal)
-                vCalendarText += vCalendar.tplM['unprocessedVEVENT'][vev].replace(RegExp('^\r\n'), '');
+        for (vev in vCalendar.tplM['unprocessedVEVENT']) {
+            if (vev == checkVal) {
+                // vCalendarText += vCalendar.tplM['unprocessedVEVENT'][vev].replace(RegExp('^\r\n'), '');
+            }
+        }
     }
 
     //vCalendar.tplM['unprocessedVEVENT']=new Array();
@@ -2582,12 +2445,13 @@ function dataToVcalendar (operation, accountUID, inputUID, inputEtag, delUID, is
     }
 }
 
-function changeVcalendarInvitation(inputEvent) {
-    /* 功能：选择接受或拒绝邀请事件
-     * 输入：inputEvent: 该事件对象
-     * 输出：无
-    */
-
+/** 
+ * @desc 选择接受或拒绝邀请事件
+ * @author BuptStEve
+ * @param {Object} inputEvent 该事件对象
+ * @param {Boolean} isAgree 是否同意
+ */
+function changeVcalendarInvitation(inputEvent, isAgree) {
     var tmp_sp1 = inputEvent.originVcalendar.split('\r\n');
     var tmp_sp2 = "";
     var tmp_output = "";
@@ -2606,7 +2470,14 @@ function changeVcalendarInvitation(inputEvent) {
 
                 if (tmp_str.split('=')[0] === "PARTSTAT") {
                     // 查找到了要修改的位置
-                    tmp_str = "PARTSTAT=ACCEPTED";
+                    if (isAgree) {
+                        // 同意该事件
+                        tmp_str = "PARTSTAT=ACCEPTED";
+                    } 
+                    else {
+                        // 拒绝该事件
+                        tmp_str = "PARTSTAT=DECLINED";
+                    }
                 }
 
                 if (j < tmp_sp2.length-1) {
@@ -4599,44 +4470,92 @@ function vcalendarToData(inputCollection, inputEvent, isNew) {
                     }
                 }
 
-                // -- 新增属性 --
+                // -- 新增属性邀请事件、新增判断订阅的他人日历 --
                 tmpObj.isInvitation = inputEvent.isInvitation;
-                if (tmpObj.isInvitation) {
-                    // 如果是邀请事件，则添加相关属性，并判断邀请状态
-                    tmpObj.isOrganizer       = inputEvent.isOrganizer;
-                    tmpObj.organizerData     = inputEvent.organizerData;
-                    tmpObj.acceptedAttendees = inputEvent.acceptedAttendees;
-                    tmpObj.declinedAttendees = inputEvent.declinedAttendees;
-                    tmpObj.unknownAttendees  = inputEvent.unknownAttendees;
-                    tmpObj.originVcalendar     = inputEvent.vcalendar;
 
-                    if (!tmpObj.isOrganizer) {
-                        // 自己在邀请事件中作为参与者，在2个状态数组中寻找自己（若为拒绝状态，则不会读取到ics）
-                        var isFound = false;
-                        
-                        for (var i = 0; i < tmpObj.acceptedAttendees.length; i++) {
-                            if (tmpObj.acceptedAttendees[i].uid === globalAccountSettings[0].cahref.slice(-37,-1)) {
-                                isFound = true;
-                                break;
+                if (!inputCollection.isSubscribed) {
+                    // 当前日历为我的日历
+                    if (tmpObj.isInvitation) {
+                        // 如果是邀请事件，则添加相关属性，并判断邀请状态
+                        tmpObj.isOrganizer       = inputEvent.isOrganizer;
+                        tmpObj.organizerData     = inputEvent.organizerData;
+                        tmpObj.acceptedAttendees = inputEvent.acceptedAttendees;
+                        tmpObj.declinedAttendees = inputEvent.declinedAttendees;
+                        tmpObj.unknownAttendees  = inputEvent.unknownAttendees;
+                        tmpObj.originVcalendar   = inputEvent.vcalendar;
+
+                        if (!tmpObj.isOrganizer) {
+                            // 自己在邀请事件中作为参与者，在未响应和已同意状态数组中寻找自己
+                            if (matchObjectArrayByProp(tmpObj.unknownAttendees, globalAccountSettings[0].cahref.slice(-37,-1), 'uid')) {
+                                // 在未响应数组中找到了，将其放入 displayEventsArray 数组,并将其在界面中的 div#invitationEventBox 中的他人邀请中显示出来
+                                displayInvitation(true, true, false, '', tmpObj);
+                            } 
+                            else if (matchObjectArrayByProp(tmpObj.acceptedAttendees, globalAccountSettings[0].cahref.slice(-37,-1), 'uid')) {
+                                // 在已同意数组中找到了，将其放入 displayEventsArray 数组,并将其在界面中的 div#invitationEventBox 中的已回复邀请中显示出来
+                                globalEventList.displayEventsArray[rid].splice(globalEventList.displayEventsArray[rid].length, 0, tmpObj);
+                                displayInvitation(false, true, true, '', tmpObj);
+                            } 
+                            else if (matchObjectArrayByProp(tmpObj.declinedAttendees, globalAccountSettings[0].cahref.slice(-37,-1), 'uid')) {
+                                // 在已拒绝数组中找到了，「不」将其放入 displayEventsArray 数组,并将其在界面中的 div#invitationEventBox 中的已回复邀请中显示出来
+                                displayInvitation(false, true, false, '', tmpObj);
+                            }
+                            else {
+                                alert('Cannot find the Obj, please check...');
                             }
                         }
-                        if (isFound) {
-                            // 在同意数组中找到了，将其放入 displayEventsArray 数组,并将其在界面中的 div#invitationEventBox 中的已回复邀请中显示出来
-                            globalEventList.displayEventsArray[rid].splice(globalEventList.displayEventsArray[rid].length, 0, tmpObj);
-                            displayInvitation(false, true, tmpObj);
-                        } 
                         else {
-                            // 说明在未响应数组里...将其在界面中的 div#invitationEventBox 中的新事件邀请中显示出来
-                            displayInvitation(true, true, tmpObj);
-                        }       
-                    }
+                            // 自己在邀请事件中作为发起者，将拒绝的用户保存下来
+                            globalEventList.displayEventsArray[rid].splice(globalEventList.displayEventsArray[rid].length, 0, tmpObj);
+                            for (var i = 0; i < tmpObj.declinedAttendees.length; i++) {
+                                displayInvitation(true, false, false, tmpObj.declinedAttendees[i].CN, tmpObj);
+                            }
+                        }                
+                    } 
                     else {
-                        // 自己在邀请事件中作为发起者
                         globalEventList.displayEventsArray[rid].splice(globalEventList.displayEventsArray[rid].length, 0, tmpObj);
-                        displayInvitation(false, false, tmpObj);
-                    }                
-                } else {
-                    globalEventList.displayEventsArray[rid].splice(globalEventList.displayEventsArray[rid].length, 0, tmpObj);
+                    }
+                }
+                else {
+                    // 当前日历为他人日历
+                    if (tmpObj.isInvitation) {
+                        // 如果是邀请事件，则添加相关属性，并判断邀请状态
+                        tmpObj.organizerData     = inputEvent.organizerData;
+                        tmpObj.acceptedAttendees = inputEvent.acceptedAttendees;
+                        tmpObj.declinedAttendees = inputEvent.declinedAttendees;
+                        tmpObj.unknownAttendees  = inputEvent.unknownAttendees;
+                        tmpObj.originVcalendar   = inputEvent.vcalendar;
+                        if (inputEvent.organizerData.uid === inputCollection.origin_uid) {
+                            // 订阅的他人日历中的事件，
+                            tmpObj.isOrganizer = true;
+                        }
+                        else {
+                            tmpObj.isOrganizer = false;
+                        }
+
+                        if (!tmpObj.isOrganizer) {
+                            // 被订阅者在邀请事件中作为参与者，在未响应和已同意状态数组中寻找被订阅者
+                            if (matchObjectArrayByProp(tmpObj.unknownAttendees, inputCollection.origin_uid, 'uid')) {
+                                // 在未响应数组中找到了，暂无操作
+                            } 
+                            else if (matchObjectArrayByProp(tmpObj.acceptedAttendees, inputCollection.origin_uid, 'uid')) {
+                                // 在已同意数组中找到了，将其放入 displayEventsArray 数组
+                                globalEventList.displayEventsArray[rid].splice(globalEventList.displayEventsArray[rid].length, 0, tmpObj);
+                            } 
+                            else if (matchObjectArrayByProp(tmpObj.declinedAttendees, inputCollection.origin_uid, 'uid')) {
+                                // 在已拒绝数组中找到了，暂无操作
+                            }
+                            else {
+                                alert('Cannot find the Obj, please check...');
+                            }
+                        }
+                        else {
+                            // 被订阅者在邀请事件中作为发起者显示该事件，暂无操作
+                            globalEventList.displayEventsArray[rid].splice(globalEventList.displayEventsArray[rid].length, 0, tmpObj);
+                        }                
+                    } 
+                    else {
+                        globalEventList.displayEventsArray[rid].splice(globalEventList.displayEventsArray[rid].length, 0, tmpObj);
+                    }
                 }
             }
         }
@@ -4644,133 +4563,164 @@ function vcalendarToData(inputCollection, inputEvent, isNew) {
     inputEvent.isDrawn = true;
 }
 
-function displayInvitation(isNeedsAction, isOthers, eventObj) {
-    /* 功能：将邀请事件在界面上显示出来,
-     *      若是需要响应事件则加入左侧（新事件邀请）,
-     *      若是我的事件,则将未响应,同意和拒绝的被邀请人分别列出来.
-     * 输入：isNeedsAction: 是否是需要响应事件;
-     *      isOthers:      是否是他人事件;
-     *      eventObj:      事件对象;
-     * 输出：无
-    */
+/** 
+ * @desc 在由对象组成的数组中，根据 prop 匹配 tar
+ * @author BuptStEve
+ * @param {Array} arr 由对象组成的数组
+ * @param {String} tar 匹配对象
+ * @param {String} prop 匹配的参数
+ * @return {Boolean} isFound 是否在数组中找到目标
+ */
+function matchObjectArrayByProp(arr, tar, prop) {
+    var isFound = false;    
 
-    var tmp_time_txt = "";
-    if (eventObj.allDay) {
-        // 该事件为全天事件，格式为：2015年10月10日 全天
-        var s_time = new Date(eventObj.start);   
-        var s_month_fix = s_time.getMonth() + 1;     
-        tmp_time_txt = "<p>" + s_time.getFullYear() + "年" + s_month_fix + "月" + s_time.getDate() + "日 全天</p>";
-    }
-    else {
-        var s_time = new Date(eventObj.start);        
-        var e_time = new Date(eventObj.end);
-        var s_minute_fix = "0";
-        var e_minute_fix = "0";
-        var s_month_fix = s_time.getMonth() + 1;
-        var e_month_fix = e_time.getMonth() + 1;
-        if (s_time.getMinutes() === 0) {
-            s_minute_fix = "00";
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i][prop] === tar) {
+            isFound = true;
+            break;
         }
-        if (e_time.getMinutes() === 0) {
-            e_minute_fix = "00";
-        }
+    }    
+    return isFound;
+}
 
-        if (s_time.getFullYear()===e_time.getFullYear() && s_month_fix===e_month_fix && s_time.getDate()===e_time.getDate()) {
-            // 该事件在一天内完成，格式为：2015年10月10日 10:00 - 12:00
-            tmp_time_txt = "<p>" + s_time.getFullYear() + "年" + s_month_fix + "月" + s_time.getDate() + "日 " + 
-                            s_time.getHours() + ":" + s_minute_fix + " - " + e_time.getHours() + ":" + e_minute_fix + "</p>";
-        } 
+/** 
+ * @desc 在由对象组成的数组中，根据 prop 匹配，若匹配成功则返回下标
+ * @author BuptStEve
+ * @param {Array} arr 由对象组成的数组
+ * @param {String} tar 匹配对象
+ * @param {String} prop 匹配的参数
+ * @return {Number} index 在数组的下标，没有则返回 -1
+ */
+function searchObjectArrayByProp(arr, tar, prop) {
+    var index = -1;    
+
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i][prop] === tar) {
+            index = i;
+            break;
+        }
+    }    
+    return index;
+}
+
+/** 
+ * @desc 将邀请事件数据保存
+ * @author BuptStEve
+ * @param {Boolean} isNew 是否是需要响应事件
+ * @param {Boolean} isOthers 是否是他人事件
+ * @param {Boolean} isAgreed 是否是已经同意（仅当 isNew === false）
+ * @param {String} declinedUser 拒绝的 User
+ * @param {Object} eventObj 事件对象
+ */
+function displayInvitation(isNew, isOthers, isAgreed, declinedUser, eventObj) {
+    // 1. 生成时间字段 
+        var tmp_time_txt = "";
+        if (eventObj.allDay) {
+            // 该事件为全天事件，格式为：2015年10月10日 全天
+            var s_time = new Date(eventObj.start);   
+            var s_month_fix = s_time.getMonth() + 1;     
+            tmp_time_txt = s_time.getFullYear() + "年" + s_month_fix + "月" + s_time.getDate() + "日 全天";
+        }
         else {
-            // 该事件涉及多天，格式为：2015年10月10日 10:00 - 2015年10月11日 12:00
-            tmp_time_txt = "<p>" + s_time.getFullYear() + "年" + s_month_fix + "月" + s_time.getDate() + "日 " + s_time.getHours() + ":" + s_minute_fix + " - " +
-                                 + e_time.getFullYear() + "年" + e_month_fix + "月" + e_time.getDate() + "日 " + e_time.getHours() + ":" + e_minute_fix + "</p>";
-        }
-    }
-
-    if (isNeedsAction) {
-        // 若是需要响应事件则加入左侧（新事件邀请）
-        var left_item_template = "<div class='box-con1-one' data-id='" + eventObj.id + "'" + ">" + 
-                                    "<h6>他人事件</h6>" +
-                                    "<div class='box-con1-one-div'>" +
-                                        "<h5><strong></strong>" + eventObj.title + "</h5>" +
-                                        tmp_time_txt +
-                                        "<p><span>" + eventObj.organizerData.CN + "</span>  邀请您加入事件</p>" +
-                                    "</div>" +
-                                    "<div class='box-yesno'>" +
-                                        "<span data-id='0'>拒绝</span>" +
-                                        "<span data-id='1'>同意</span>" +
-                                    "</div>" +
-                                "</div>";
-        $('#invitationEventBox li.box-con1').append(left_item_template);
-
-        $('#invitationEventBox li.box-con1').find('div.box-yesno:last span').click(function() {
-            // 添加同意和拒绝的事件
-            if ($(this).attr('data-id') === "1") {
-                changeVcalendarInvitation(eventObj);
+            var s_time = new Date(eventObj.start);        
+            var e_time = new Date(eventObj.end);
+            var s_minute_fix = "0";
+            var e_minute_fix = "0";
+            var s_month_fix = s_time.getMonth() + 1;
+            var e_month_fix = e_time.getMonth() + 1;
+            if (s_time.getMinutes() === 0) {
+                s_minute_fix = "00";
             }
+            if (e_time.getMinutes() === 0) {
+                e_minute_fix = "00";
+            }
+
+            if (s_time.getFullYear()===e_time.getFullYear() && s_month_fix===e_month_fix && s_time.getDate()===e_time.getDate()) {
+                // 该事件在一天内完成，格式为：2015年10月10日 10:00 - 12:00
+                tmp_time_txt = s_time.getFullYear() + "年" + s_month_fix + "月" + s_time.getDate() + "日 " + 
+                               s_time.getHours() + ":" + s_minute_fix + " - " + e_time.getHours() + ":" + e_minute_fix;
+            } 
             else {
-                // 删除ics
-                deleteVcalendarFromCollection(eventObj.id, "vevent");
+                // 该事件涉及多天，格式为：2015年10月10日 10:00 - 2015年10月11日 12:00
+                tmp_time_txt = s_time.getFullYear() + "年" + s_month_fix + "月" + s_time.getDate() + "日 " + s_time.getHours() + ":" + s_minute_fix + " - " +
+                             + e_time.getFullYear() + "年" + e_month_fix + "月" + e_time.getDate() + "日 " + e_time.getHours() + ":" + e_minute_fix;
             }
-        });
+        }
+        var tmp_obj = {
+            compView: '',
+            uid: eventObj.id,
+            title: eventObj.title,
+            time: tmp_time_txt,
+            user: eventObj.organizerData.CN,
+            head: true,
+            color: globalDefaultCalendar.ecolor,
+            obj: eventObj
+        }
+
+    // 2. 插入数据
+        if (isNew) {
+            // 2.1. 加入左侧
+            if (isOthers) {
+                // 他人事件的新事件邀请
+                tmp_obj.compView = 'invitationComp';
+                InvitationEventBox.partNewItems.unshift(tmp_obj);
+            } 
+            else {
+                // 我的事件，但被他人拒绝
+                tmp_obj.compView = 'responseComp';
+                tmp_obj.user = declinedUser;
+                InvitationEventBox.partNewItems.unshift(tmp_obj);            
+            }
+        }
+        else {
+            // 2.2. 加入右侧
+            tmp_obj.compView = 'oldInvitationComp';
+            if (isAgreed) {
+                // 已同意
+                tmp_obj.mode = 'agreed';
+            } 
+            else {
+                // 已拒绝
+                tmp_obj.mode = 'declined';
+            }
+            InvitationEventBox.partOldItems.push(tmp_obj); 
+        }
+
+    // 新增提示消息条目
+    displayNewInvitationNumber(InvitationEventBox.partNewItems.length);
+}
+
+/** 
+ * @desc 新增提示消息条目函数，将新消息的数目显示在界面上 
+ * @author BuptStEve
+ * @param {Number} len
+ * @return {null} null
+ * @example null
+ */
+function displayNewInvitationNumber(len) {
+    if (typeof(len) !== 'number' || len < 0) {
+        alert('len is not a corret number! please check...');
+        return;
+    }
+
+    if (len === 0) {
+        $("#newInvitationNum").text('');
+        $("#newInvitationNum").removeClass();
+    } 
+    else if (len < 10) {
+        $("#newInvitationNum").text(len);
+        $("#newInvitationNum").removeClass();
+        $("#newInvitationNum").addClass('singleDigit');
+    }
+    else if (len < 100) {
+        $("#newInvitationNum").text(len);
+        $("#newInvitationNum").removeClass();
+        $("#newInvitationNum").addClass('doubleDigit');
     }
     else {
-        // 加入右侧
-        var right_item_template = "";
-        if (isOthers) {
-            // 他人事件
-            right_item_template =   "<div class='box-con1-one' data-id='" + eventObj.id + "'" + ">" + 
-                                        "<h6>他人事件</h6>" +
-                                        "<div class='box-con1-one-div'>" +
-                                            "<h5><strong></strong>" + eventObj.title + "</h5>" +
-                                            tmp_time_txt +
-                                            "<p><span>" + eventObj.organizerData.CN + "</span>  邀请您加入事件</p>" +
-                                        "</div>" +
-                                        // "<div class='box-yesno'>" +
-                                        //     "<span>同意</span>" +
-                                        // "</div>" +
-                                    "</div>";
-        } 
-        else {
-            // 是我的事件,则将未响应,同意和拒绝的被邀请人分别列出来
-            var accepted_attendees = "",
-                unknown_attendees  = "",
-                declined_attendees = "",
-                tmp_html           = "";
-
-            for (var i = 0; i < eventObj.acceptedAttendees.length; i++) {
-                accepted_attendees += eventObj.acceptedAttendees[i].CN;
-            }
-            for (var i = 0; i < eventObj.unknownAttendees.length; i++) {
-                unknown_attendees += eventObj.unknownAttendees[i].CN;
-            }
-            for (var i = 0; i < eventObj.declinedAttendees.length; i++) {
-                declined_attendees += eventObj.declinedAttendees[i].CN;
-            }
-
-            if (accepted_attendees != "") {
-                tmp_html += "<p><span>" + accepted_attendees + "</span>  已接受邀请</p>";
-            }
-            if (unknown_attendees != "") {
-                tmp_html += "<p><span>" + unknown_attendees + "</span>  未响应邀请</p>";
-            }
-            if (declined_attendees != "") {
-                tmp_html += "<p><span>" + declined_attendees + "</span>  已拒绝邀请</p>";
-            }
-
-            right_item_template =  "<div class='box-con1-one' data-id='" + eventObj.uid + "'" + ">" + 
-                                        "<h6>我的事件</h6>" +
-                                        "<div class='box-con1-one-div'>" +
-                                            "<h5><strong></strong>" + eventObj.title + "</h5>" +
-                                            tmp_time_txt +
-                                            tmp_html +
-                                        "</div>" +
-                                        // "<div class='box-yesno'>" +
-                                        //     "<span>同意</span>" +
-                                        // "</div>" +
-                                    "</div>";
-        }
-        $('#invitationEventBox li.box-con2').append(right_item_template);
+        $("#newInvitationNum").text('...');
+        $("#newInvitationNum").removeClass();
+        $("#newInvitationNum").addClass('doubleDigit');
     }
 }
 

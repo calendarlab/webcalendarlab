@@ -414,62 +414,66 @@ function updateSettings() {
     if (!tmp_defaultCalendar.isShared) {
         // 当前日历不是共享日历，不显示共享日历
         $('.defaultCalendar strong').css('visibility', 'hidden');
+    } else {
+        $('.defaultCalendar strong').css('visibility', 'visible');
     }
 
-    if ($('.settingMy').find('li').length > 1) {
-        $('.settingMy').html($('.settingMy').find('.calendarliTemplate').clone().wrap('<li>'));
-    }
+    // ----------------------
+    // if ($('.settingMy').find('li').length > 1) {
+    //     $('.settingMy').html($('.settingMy').find('.calendarliTemplate').clone().wrap('<li>'));
+    // }
 
-    var cals = globalResourceCalDAVList.collections;
-    for(var i=0; i<cals.length; i++) {
-        if (cals[i].uid != undefined && !cals[i].isSubscribed) {
-            // 新增排除他人日历
+    // var cals = globalResourceCalDAVList.collections;
+    // for(var i=0; i<cals.length; i++) {
+    //     if (cals[i].uid != undefined && !cals[i].isSubscribed) {
+    //         // 新增排除他人日历
             
-            var newCalendar = $('.settingMy').find('.calendarliTemplate').clone().wrap('<li>');
-            newCalendar.removeClass('calendarliTemplate');
-            newCalendar.attr('data-id', cals[i].uid);
-            newCalendar.find('span').css('background', cals[i].ecolor);
-            newCalendar.find('p').html(cals[i].displayvalue);
-            if (!cals[i].isShared) {
-                newCalendar.find('.sharedli').css('visibility', 'hidden');
-            }
-            if (cals[i].uid === globalDefaultCalendar.uid) {
-                newCalendar.find('.Mycho').addClass('active');
-            }
-            $('.settingMy').append(newCalendar); 
-        }
-    }
+    //         var newCalendar = $('.settingMy').find('.calendarliTemplate').clone().wrap('<li>');
+    //         newCalendar.removeClass('calendarliTemplate');
+    //         newCalendar.attr('data-id', cals[i].uid);
+    //         newCalendar.find('span').css('background', cals[i].ecolor);
+    //         newCalendar.find('p').html(cals[i].displayvalue);
+    //         if (!cals[i].isShared) {
+    //             newCalendar.find('.sharedli').css('visibility', 'hidden');
+    //         }
+    //         if (cals[i].uid === globalDefaultCalendar.uid) {
+    //             newCalendar.find('.Mycho').addClass('active');
+    //         }
+    //         $('.settingMy').append(newCalendar); 
+    //     }
+    // }
 
-    $('.settingMy').find('li').each(function(index, el) {
-        $(el).click(function(event) {
-            $('.settingMy').find('.active').removeClass('active');
-            $(el).find('.Mycho').addClass('active');
-            var tmp_data_id = $(el).attr("data-id");
+    // $('.settingMy').find('li').each(function(index, el) {
+    //     $(el).click(function(event) {
+    //         $('.settingMy').find('.active').removeClass('active');
+    //         $(el).find('.Mycho').addClass('active');
+    //         var tmp_data_id = $(el).attr("data-id");
 
-            $('#ResourceCalDAVList').find('.myListItem.resourceCalDAV_item_selected').removeClass('resourceCalDAV_item_selected');
-            $('#ResourceCalDAVList').find('.myListItem').each(function(index, el) {
-                if ($(el).attr("data-id") === tmp_data_id) {
-                    $(el).addClass('resourceCalDAV_item_selected');
-                }
-            });
+    //         $('#ResourceCalDAVList').find('.myListItem.resourceCalDAV_item_selected').removeClass('resourceCalDAV_item_selected');
+    //         $('#ResourceCalDAVList').find('.myListItem').each(function(index, el) {
+    //             if ($(el).attr("data-id") === tmp_data_id) {
+    //                 $(el).addClass('resourceCalDAV_item_selected');
+    //             }
+    //         });
 
-            globalDefaultCalendar = globalResourceCalDAVList.getCollectionByUID(tmp_data_id);
-            $('.defaultCalendar span').css('background', globalDefaultCalendar.ecolor); // 默认日历的颜色
-            $('.defaultCalendar p').html(globalDefaultCalendar.displayvalue); // 默认日历的名称
-            if (!globalDefaultCalendar.isShared) {
-                // 当前日历不是共享日历，不显示共享日历
-                $('.defaultCalendar strong').css('visibility', 'hidden');
-            }
-            $('.settingMy').css('display', 'none');
-        });
-    });
+    //         globalDefaultCalendar = globalResourceCalDAVList.getCollectionByUID(tmp_data_id);
+    //         $('.defaultCalendar span').css('background', globalDefaultCalendar.ecolor); // 默认日历的颜色
+    //         $('.defaultCalendar p').html(globalDefaultCalendar.displayvalue); // 默认日历的名称
+    //         if (!globalDefaultCalendar.isShared) {
+    //             // 当前日历不是共享日历，不显示共享日历
+    //             $('.defaultCalendar strong').css('visibility', 'hidden');
+    //         }
+    //         $('.settingMy').css('display', 'none');
+    //     });
+    // });
+    // ----------------------
 
     // 将联系人列表中自己的部分删除
-    $('#contacts .myContacts li').each(function() {
-        if (globalUsersData[$(this).attr('data-id')].uuid === globalAccountSettings[0].cahref.slice(-37,-1)) {
-            $(this).remove();
-        } 
-    });
+    // $('#contacts .myContacts li').each(function() {
+    //     if (globalUserData[$(this).attr('data-id')].uuid === globalAccountSettings[0].cahref.slice(-37,-1)) {
+    //         $(this).remove();
+    //     } 
+    // });
 }
 
 function updateMainLoaderTextTimezone () {
@@ -1408,7 +1412,6 @@ function showAlertEvents(inputUID, realDelay, alarmObject) {
     }
 }
 
-
 function clearAlertEvents () {
     // 功能：
     // 输入：
@@ -1446,7 +1449,7 @@ function addAndEdit (isFormHidden, deleteMode, attendees) {
     else {
         return false;
     }
-    dataToVcalendar('EDIT',origUID, inputUID, $('#etag').val(), '', isFormHidden, deleteMode, attendees);
+    dataToVcalendar('EDIT', origUID, inputUID, $('#etag').val(), '', isFormHidden, deleteMode, attendees);
 }
 
 function interResourceEdit (op, delUID,isFormHidden) {
@@ -1478,7 +1481,8 @@ function save (isFormHidden, deleteMode) {
     // 输出：
     // console.log("③interface_func save");
     
-    $('#event_details_template').scrollTop(0);
+    $('#eventLoader').show();
+
     if (!deleteMode) {
         // console.log("into !deleteMode;");
 
@@ -1549,6 +1553,7 @@ function save (isFormHidden, deleteMode) {
     }
     else {
         console.log("else");
+        $('#eventLoader').hide();
         show_editor_loader_messageCalendar('vevent', 'message_error', localization[globalInterfaceLanguage].txtNotChoose);
     }
 }
@@ -1560,6 +1565,7 @@ function deleteEvent () {
     // console.log("③interface_func deleteEvent");
 
     var delUID = $('#uid').val();
+    $('#eventLoader').show();
 
     if (delUID != '') {
         deleteVcalendarFromCollection (delUID, 'vevent');
@@ -2358,7 +2364,7 @@ function initFullCalendar () {
         startOfBusiness: globalSettings.calendarstartofbusiness.value,
         endOfBusiness: globalSettings.calendarendofbusiness.value,
         multiWeekSize: globalMultiWeekSize,
-        showWeekNumbers: true,
+        showWeekNumbers: false,
         showDatepicker: false,
         //ignoreTimezone: !globalSettings.timezonesupport.value,
         titleFormat: {
@@ -2480,7 +2486,8 @@ function initFullCalendar () {
                 showEventForm (null, calEvent.allDay, calEvent, jsEvent, 'show', '');
             }
             else {
-                showEventForm (null, calEvent.allDay, calEvent, jsEvent, 'show', 'editOnly');
+                   showEventForm(null, calEvent.allDay, calEvent, jsEvent, 'show', '', true);
+                // showEventForm (null, calEvent.allDay, calEvent, jsEvent, 'show', 'editOnly');
             }            
         },
         eventDragStart: function (calEvent, jsEvent, ui, view) {
@@ -2495,6 +2502,13 @@ function initFullCalendar () {
                     return false;
                 }
             }
+
+            if (calEvent.isInvitation && !calEvent.isOrganizer) {
+                    // 恢复原状
+                    revertFunc();
+                    return false;                
+            }
+
             if (calEvent.realStart && calEvent.realEnd) {
                 var checkDate    = new Date (calEvent.realStart.getFullYear(), calEvent.realStart.getMonth(), 
                                              calEvent.realStart.getDate() + dayDelta, calEvent.realStart.getHours(), 
@@ -2518,7 +2532,9 @@ function initFullCalendar () {
 
             globalRevertFunction = revertFunc;
             if (calEvent.type != '') {
-                showEventForm (null, calEvent.allDay, calEvent, jsEvent, 'drop', 'editOnly');
+                globalCalEvent = calEvent;
+                globalJsEvent  = jsEvent;
+                 showEventForm (null, calEvent.allDay, calEvent, jsEvent, 'drop', 'editOnly');
             }
             else {
                 showEventForm (null, calEvent.allDay, calEvent, jsEvent, 'drop', '');
@@ -2555,6 +2571,8 @@ function initFullCalendar () {
             globalRevertFunction = revertFunc;
 
             if (calEvent.type != '') {
+                globalCalEvent = calEvent;
+                globalJsEvent  = jsEvent;
                 showEventForm (null, calEvent.allDay, calEvent, jsEvent, 'drop', 'editOnly');
             }
             else {
@@ -2600,23 +2618,23 @@ function initFullCalendar () {
                 }
             }
 
-            element.mouseenter (function (e) {
-                clearTimeout(globalEventTimeoutID);
-                globalEventTimeoutID = setTimeout(function () {
-                    showEventPopup (e, event);
-                }, 500);
-            });
-            element.mousemove (function (e) {
-                if ($('#CalDavZAPPopup').is(':visible')) {
-                    moveEventPopup (e);
-                }
-            });
-            element.mouseout(function (e) {
-                if (!$.contains(element.get(0),e.relatedTarget)) {
-                    clearTimeout(globalEventTimeoutID);
-                    hideEventPopup();
-                }
-            });
+            // element.mouseenter (function (e) {
+            //     clearTimeout(globalEventTimeoutID);
+            //     globalEventTimeoutID = setTimeout(function () {
+            //         showEventPopup (e, event);
+            //     }, 500);
+            // });
+            // element.mousemove (function (e) {
+            //     if ($('#CalDavZAPPopup').is(':visible')) {
+            //         moveEventPopup (e);
+            //     }
+            // });
+            // element.mouseout(function (e) {
+            //     if (!$.contains(element.get(0),e.relatedTarget)) {
+            //         clearTimeout(globalEventTimeoutID);
+            //         hideEventPopup();
+            //     }
+            // });
         },
         viewChanged: function (view) {
             $('#CAEvent').hide();

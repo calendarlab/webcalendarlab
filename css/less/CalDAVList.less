@@ -1,6 +1,4 @@
 @charset "utf-8";
-@import "z";
-@import "css3";
 
 // ===登录成功后左侧的日历显示栏===
 // --变量定义、自定义函数及公共部分--
@@ -24,14 +22,9 @@
 	@others-mt: 46px;
 	@label-r: 8px;
 
-
-	.bor-bottom (@w:1px, @c:@border-c) {
-		border-bottom: @w solid @c;
-	}
-
-	.bor-right (@w:1px, @c:@border-c) {
-		border-right: @w solid @c;
-	}
+	.fr(@f:right) { float: @f; display: inline; }
+	.bor-bottom (@w:1px, @c:@border-c) { border-bottom: @w solid @c; }
+	.bor-right (@w:1px, @c:@border-c) { border-right: @w solid @c; }
 
 	#resourceCalDAV_h, #ResourceCalDAVList {
 		// 公共部分
@@ -78,15 +71,14 @@
 	  	background-color: @menub-c;
 	  	z-index: 26;
 
-		.abs();
+		position: absolute;
 
         border: 1px solid #D6D6D6;
         border-radius: 4px;
-        box-shadow: 1px 1px 11px #B9B9B9;
-
+        box-shadow: 1px 1px 10px #969696;
 	}
 
-	#menu-setting, #menu-logout {
+	#menu-setting, #menu-logout, #menu-changePSD {
 		width: @menu-item-w;
 		height: @menu-item-h;
 		line-height: @menu-item-h;
@@ -100,14 +92,14 @@
 
 	.menu-title {
 		// 文字标题
-		.font-s(12px);
+		font-size: 12px;
 	}
 
 
 // --具体日历显示的头部--
 	#ResourceCalDAVList {
-		.abs();
-		.d-b();
+		position: absolute;
+		display: block;
 		top: @header-h;
 		bottom: 0px;
 		overflow: auto;
@@ -133,7 +125,7 @@
 		// 日历标题
 		color: @font-h-c;
 
-		.font-s(16px);
+		font-size: 16px;
 	}
 
 	.ListHeaderPlus {
@@ -151,7 +143,7 @@
 
 // --CSS3实现的radio外观的checkbox--
 	.regular-checkbox {
-		.d-n();
+		display: none;
 	}
 
 	.regular-checkbox + label {
@@ -165,7 +157,7 @@
 		-webkit-appearance: none;
 		-moz-appearance: none;
 
-		.d-ib();
+		display: inline-block;
 	}
 
 	.labelafter {
@@ -176,7 +168,7 @@
 		background: black;
 		cursor: pointer;
 
-		.abs();
+		position: absolute;
 	}
 
 // --item的后续项目--
@@ -188,8 +180,8 @@
 	    overflow: hidden;
 	    text-overflow: ellipsis;
 
-		.d-ib();
-		.font-s(16px);
+		display: inline-block;
+		font-size: 16px;
 	}
 
 	.ListItemShare {
@@ -200,8 +192,8 @@
 		overflow: hidden;
 		margin: 0 0 -1px 10px;
 
-		.d-ib();
-		.font-s(10px);
+		display: inline-block;
+		font-size: 10px;
 	}
 
 	.ListItemOwner {
@@ -216,8 +208,8 @@
 		line-height: @item-h;
 	    text-align: right;
 
-		.d-ib();
-		.font-s(10px);
+		display: inline-block;
+		font-size: 10px;
 	}
 	
 	.ListItemOption {

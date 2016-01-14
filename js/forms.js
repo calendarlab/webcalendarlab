@@ -70,8 +70,8 @@ function setFormPosition(jsEvent, confirmRepeat) {
     $('#CAEvent').css('bottom', '');
     $('#CAEvent').css(position_v, dist_x);
     $('#CAEvent').css(position_h, dist_y);
-    $('#event_details_template').css('max-height', $('#main').height() - dist_y + 20 + 'px');
-    $('#CAEvent').css('max-height', $('#main').height() - dist_y + 20 + 'px');
+    // $('#event_details_template').css('max-height', $('#main').height() - dist_y + 20 + 'px');
+    // $('#CAEvent').css('max-height', $('#main').height() - dist_y + 20 + 'px');
 }
 
 function showTimezones(selTimezone, todoSelector) {
@@ -123,15 +123,15 @@ function showTimezones(selTimezone, todoSelector) {
     }
 }
 
-function findUserUid(email) {
-    /* 功能：根据email，查找并返回用户在globalUsersData中的uid
+function findUserNum(email) {
+    /* 功能：根据email，查找并返回用户在 globalUserData 中的 Num
      * 输入：email: 电子邮箱地址
-     * 输出：uid
+     * 输出：Num
     */
 
-    for (var i = 0; i < globalUsersData.length; i++) {
-        if (globalUsersData[i].e_mail === email) {
-            return globalUsersData[i].uid;
+    for (var i = 0; i < globalUserData.length; i++) {
+        if (globalUserData[i].e_mail === email) {
+            return i
         }
     }
 }
@@ -169,17 +169,23 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
     var tmp_html = "";
     var tmp_dataId = "";
     if (calEvent && calEvent.isInvitation) {
-        for (var el of calEvent.acceptedAttendees) {
-            tmp_html   += "," + el.CN;
-            tmp_dataId += "," + findUserUid(el.EMAIL);
+        for (var el in calEvent.acceptedAttendees) {
+            if (calEvent.acceptedAttendees.hasOwnProperty(el) === true) {            
+                tmp_html   += "," + calEvent.acceptedAttendees[el].CN;
+                tmp_dataId += "," + findUserNum(calEvent.acceptedAttendees[el].EMAIL);
+            }
         }
-        for (var el of calEvent.declinedAttendees) {
-            tmp_html   += "," + el.CN;
-            tmp_dataId += "," + findUserUid(el.EMAIL);
+        for (var el in calEvent.declinedAttendees) {
+            if (calEvent.declinedAttendees.hasOwnProperty(el) === true) {            
+                tmp_html   += "," + calEvent.declinedAttendees[el].CN;
+                tmp_dataId += "," + findUserNum(calEvent.declinedAttendees[el].EMAIL);
+            }
         }
-        for (var el of calEvent.unknownAttendees) {
-            tmp_html   += "," + el.CN;
-            tmp_dataId += "," + findUserUid(el.EMAIL);
+        for (var el in calEvent.unknownAttendees) {
+            if (calEvent.unknownAttendees.hasOwnProperty(el) === true) {            
+                tmp_html   += "," + calEvent.unknownAttendees[el].CN;
+                tmp_dataId += "," + findUserNum(calEvent.unknownAttendees[el].EMAIL);
+            }
         }
     }
     if (tmp_html != "") {
@@ -215,26 +221,22 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
                     'top': $('#event_details_template').offset().top
                 });
             }
+
             $('#contacts').css({
-                'display': 'block',
                 'margin': '0',
                 'z-index': '30',
             });
-            $('.ezz').css('z-index', 27);
+            $('.borderSpan').css('z-index', 30);
+            $('.contactContent').css('z-index', 30);
+            Contacts.isShow = true;
+            Contacts.modalZ = 27;
+            Contacts.mode = 'invite';
+            Contacts.inviteUser = [];
 
             // 若是已有邀请人，则读取 #addPartnerTxt 的 data-id ,将已选联系人勾选上
             if ($('#addPartnerTxt').attr('data-id')) {
-                var tmp_users = $('#addPartnerTxt').attr('data-id').split(',');
-                $('#contacts .group li').each(function() {
-                    // data-id 匹配成功，将其增加 .active
-                    for (var i = 0; i < tmp_users.length; i++) {
-                        if ($(this).attr('data-id') === tmp_users[i]) {
-                            // 匹配成功
-                            $(this).addClass('active');
-                            break;
-                        }
-                    }
-                });
+                Contacts.inviteUser = $('#addPartnerTxt').attr('data-id').split(',');
+                Contacts.addActive();
             }
         });
 
@@ -285,12 +287,26 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
     });
 
     // -----------------------
-    if (mod == 'new') {
-        var activeCollection = $('#ResourceCalDAVList').find('.myListItem.resourceCalDAV_item_selected');
-
-        if (activeCollection.length > 0 && !globalResourceCalDAVList.getEventCollectionByUID(activeCollection.attr('data-id')).permissions.read_only) {
-            color = rgbToHex(activeCollection.find('.labelafter').css('background-color'));
+    if (!globalResourceCalDAVList.getEventCollectionByUID(globalDefaultCalendar.uid)) {
+        // 如果默认日历已被删除，则重新指定
+        var i = 0;
+        for (i = 0; i < globalResourceCalDAVList.collections.length; i += 1) {
+            if (!globalResourceCalDAVList.collections[i].isSubscribed) {
+                // 非他人日历
+                globalDefaultCalendar = globalResourceCalDAVList.collections[i];
+                break;
+            }
         }
+    }
+
+    if (mod == 'new') {
+        // var activeCollection = $('#ResourceCalDAVList').find('.myListItem.resourceCalDAV_item_selected');
+
+        // if (activeCollection.length > 0 && !globalResourceCalDAVList.getEventCollectionByUID(activeCollection.attr('data-id')).permissions.read_only) {
+        //     color = rgbToHex(activeCollection.find('.labelafter').css('background-color'));
+        // }
+
+        color = globalResourceCalDAVList.getEventCollectionByUID(globalDefaultCalendar.uid).ecolor;
     } else {
         color = globalResourceCalDAVList.getEventCollectionByUID(calEvent.res_id).ecolor;
     }
@@ -302,13 +318,13 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
         $('#repeatConfirmBox').css('visibility', 'visible');
 
         if (calEvent.repeatCount != '' && calEvent.repeatCount == 1) {
-            $('#editFuture').css('display', 'none');
-            if ($('#editFuture').next('br').length > 0)
-                $('#editFuture').next().remove();
-        } else if ($('#editFuture').css('display') == 'none') {
-            $('#editFuture').css('display', 'block');
-            if ($('#editFuture').next('br').length == 0)
-                $('#editFuture').after('<br/>')
+            $('#editFuture').css('visibility', 'hidden');
+            // if ($('#editFuture').next('br').length > 0)
+            //     $('#editFuture').next().remove();
+        } else if ($('#editFuture').css('visibility') == 'hidden') {
+            $('#editFuture').css('visibility', 'visible');
+            // if ($('#editFuture').next('br').length == 0)
+            //     $('#editFuture').after('<br/>')
         }
         $('#repeatConfirmBoxContent').html('<b>' + calEvent.title + "</b> " + localization[globalInterfaceLanguage].repeatBoxContent);
         $('#repeatConfirmBoxQuestion').html(localization[globalInterfaceLanguage].repeatBoxQuestion);
@@ -316,11 +332,11 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
         $('#editAll, #editOnlyOne, #editFuture').click(function() {
             if (globalCalEvent) {
                 if ($(this).attr('id') == 'editOnlyOne')
-                    showEventForm(null, globalCalEvent.allDay, globalCalEvent, globalJsEvent, 'show', 'editOnly');
+                    showEventForm(null, globalCalEvent.allDay, globalCalEvent, globalJsEvent, mod, 'editOnly');
                 else if ($(this).attr('id') == 'editAll')
-                    showEventForm(null, globalCalEvent.allDay, globalCalEvent, globalJsEvent, 'show', '');
+                    showEventForm(null, globalCalEvent.allDay, globalCalEvent, globalJsEvent, mod, '');
                 else if ($(this).attr('id') == 'editFuture')
-                    showEventForm(null, globalCalEvent.allDay, globalCalEvent, globalJsEvent, 'show', 'futureOnly');
+                    showEventForm(null, globalCalEvent.allDay, globalCalEvent, globalJsEvent, mod, 'futureOnly');
 
                 $('#repeatConfirmBoxContent').html('');
                 $('#repeatConfirmBox').css('visibility', 'hidden');
@@ -384,7 +400,8 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
         if ($('#ResourceCalDAVList').find('.myListItem').length > 0 &&
             $('#event_calendar').find('option[value="' + $('#ResourceCalDAVList').find('.myListItem.resourceCalDAV_item_selected').attr("data-id") + '"]').length > 0) {
 
-            $('.R_calendar').val($('#ResourceCalDAVList').find('.myListItem.resourceCalDAV_item_selected').attr("data-id"));
+            // $('.R_calendar').val($('#ResourceCalDAVList').find('.myListItem.resourceCalDAV_item_selected').attr("data-id"));
+            $('.R_calendar').val(globalDefaultCalendar.uid);
         } else {
             $('#event_calendar').val('choose');
         }
@@ -570,7 +587,7 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
                 $('.alert_message_date[data-id="' + (alarmIterator + 1) + '"]').show();
             }
         }
-
+        
         if (alarmIterator > 0) {
             event_alert_add(alarmIterator + 2);
         }
@@ -982,7 +999,7 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
     }
 
     if (repeatOne == 'editOnly' || $('#recurrenceID').val() != '') {
-        // $('#repeat').parent().parent().css('display', 'none');
+        $('#repeat').parent().parent().css('display', 'none');
         $('#week_custom').css('display', 'none');
         $('#month_custom1').css('display', 'none');
         $('#month_custom2').css('display', 'none');
@@ -992,7 +1009,7 @@ function showEventForm(date, allDay, calEvent, jsEvent, mod, repeatOne, confirmR
         $('#repeat_details').css('display', 'none');
     }
 
-    if (repeatOne == 'editOnly' || repeatOne == 'futureOnly' || $('#recurrenceID').val())
+   if (repeatOne == 'editOnly' || repeatOne == 'futureOnly' || $('#recurrenceID').val())
     // $('#calendarLine').hide();
         if (calEvent == null || calEvent.type == '')
             $('#editOptionsButton').hide();

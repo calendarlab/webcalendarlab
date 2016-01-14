@@ -1,131 +1,377 @@
 @charset "utf-8";
-@import "z";
-@import "css3";
 
 /*--公用--*/
-li {
-    list-style: none;
-}
+    * { margin: 0; padding: 0; }
+    li { list-style: none; }
+    html, body, #vue_comps { width: 100%; height: 100%; }
 
-html, body, #vue_comps {
-    width: 100%;
-    height: 100%;
-}
+    // 淡入淡出
+    .fade-transition { transition: opacity .3s ease; }
+    .fade-enter, .fade-leave { opacity: 0; }
 
-.modalDisable {
-    // 模态对话框的背景
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
+    .modalDisable {
+        // 模态对话框的背景
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+/*-- 联系人弹出框 --*/
+    #contacts {
+        overflow: hidden;
+        position: absolute;
+        top: 10%;
+        left: 55%;
+        z-index: 26;
+        // margin: 60px 0 0 90px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        width: 380px;
+        min-height: 168px;
+        max-height: 537px;
+        background: #fbfbfb;
+        box-shadow: 1px 1px 10px #969696;
+
+        .borderSpan {
+            display: block;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            position: relative;
+            z-index: 26;
+
+            .searchli {
+                margin: 0 0 0 40px !important;
+                border: none;
+                border-radius: 5px;
+                width: 324px;
+                height: 40px;
+                font-size: 16px;
+                line-height: 35px;
+                color: #555;
+                outline: none;;
+            }
+
+            #resetContactBtn {
+                position: absolute;
+                margin: 10px 0 0 -23px;
+                cursor: pointer;
+            }
+        }
+        .borderSpan:after {
+            position: absolute;
+            margin: 53px 0 0 -365px;
+            border-top: 1px solid #d1d1d1;
+            width: 380px;
+            content: "";
+        }
+
+        .contactContent {
+            overflow: auto;
+            height: 500px;
+            position: relative;
+            z-index: 26;
+
+            .group {
+                padding-bottom: 5px;
+
+                .groupHeader {
+                    display: block;
+                    padding: 0 0 5px 30px;
+                    border-bottom: 1px solid #ccc;
+                    height: 30px;
+                    line-height: 30px;
+                    background: url(../images/btn_arrow_next.png) no-repeat 7px 7px;
+                    cursor: pointer;
+
+                    .groupTitle {
+                        font-size: 16px;
+                        color: #999;
+                    }
+                }
+            }
+
+            .myContacts {
+                max-height: 400px;
+            }
+            
+            .myContacts,
+            .searchContacts {
+                overflow-y: auto;
+
+                img {
+                    float: right;
+                    margin-top: 8px;
+                    margin-right: 20px;
+                }
+
+                li {
+                    border-bottom: 1px solid #ccc;
+                    padding-left: 30px;
+                    line-height: 38px;
+                    background: url(../images/ToBeChosen_contact.png) no-repeat 1px 10px;
+                    cursor: pointer;
+
+                    span {
+                        font-size: 16px;
+                        color: #555;
+                    }
+                }
+                li.active {
+                    background: url(../images/chosen_contact.png) no-repeat 1px 10px;
+                }
+            }
+        }
+    }
+    
+/*-- 邀请事件消息对话框 --*/
+    #invitationEventBox {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 26;
+        margin: -212px 0 0 -230px;
+        border: 1px solid #ccc;
+        border-radius: 7px;
+        width: 460px;
+        height: 424px;
+        background-color: #fbfbfb;
+        box-shadow: 1px 1px 10px #969696;
+
+        .invitationEventBoxHeader {
+            overflow: hidden;
+            margin: 13px auto;
+            border: 2px solid #4bce0e;
+            border-radius: 50px;
+            width: 276px;
+
+            li {
+                float: left;
+                width: 50%;
+                height: 26px;
+                font-size: 16px;
+                line-height: 26px;
+                text-align: center;
+                color: #26c008;
+                cursor: pointer;
+            }
+            li.active {
+                color: #fff;
+                background: #4bce0e;
+            }
+        }
+
+        .invitationEventBoxContent {
+            overflow-y: auto;
+            border-top: 1px solid #ccc;
+            padding: 0 20px;
+            height: 352px;
+
+            // 各个选项
+            .invitationEventBoxItemWrapper {
+                // 至少包含一个邀请提醒的包裹层
+                margin: 10px 0 0 0;
+
+                h6 {
+                    // 最上方的事件说明
+                    font-size: 12px;
+                    line-height: 18px;
+                    color: #999;
+                }
+                .invitationEventBoxItem {
+                    position: relative;
+                    border: 1px solid #ccc;
+                    border-radius: 3px;
+                    padding: 10px;
+                    background-color: #fff;
+
+                    h5 {
+                        // 事件标题
+                        font-size: 14px;
+                        line-height: 20px;
+                        color: #3e3b3b;
+
+                        strong {
+                            // 日历颜色展现
+                            display: inline-block;
+                            margin: 0 10px -2px 0;
+                            border-radius: 50%;
+                            width: 14px;
+                            height: 14px;
+                            background: red;
+                        }
+                    }
+                    p {
+                        // 具体内容
+                        padding-left: 21px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        line-height: 20px;
+                        color: #7d7d7d;
+                    }
+                }
+                .box-yesno {
+                    position: absolute;
+                    top: 17px;
+                    right: 10px;
+
+                    span {
+                        border: 1px solid #ccc;
+                        border-radius: 6px;
+                        padding: 6px 12px;
+                        color: #6d6d6d;
+                        cursor: pointer;
+                    }
+                    span.agree {
+                        color: #fff;
+                        background: #4bce0e;
+                    }
+                    span.done {
+                        color: #fff;
+                        background: #999;
+                    }
+                } 
+            }
+        }
+    }
+
+/*-- 偏好设置 --*/
+    .settingMy {
+        overflow-y: hidden;
+        position: absolute;
+        top: 38px;
+        right: -1px;
+        z-index: 30;
+        border: 1px solid #ccc;
+        padding: 0 15px;
+        width: 258px;
+        max-height: 300px;
+        background: #fff;
+
+        li {
+            top: 0;
+            z-index: 30;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            border-bottom: 1px solid #e1e1e1;
+            padding: 8px 0;
+            width: 100%;
+
+            p {
+                float: left;
+                width: 128px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            span {
+                display: inline-block;
+                float: left;
+                margin-top: 5px;
+                margin-right: 10px;
+                margin-left: 5px;
+                border-radius: 50%;
+                width: 15px;
+                height: 15px;
+                background: red;
+            }
+
+            strong {
+                float: right;
+                font-weight: 100;
+            }
+            strong.active {
+                background: url("../images/spanbj-1.png")  no-repeat center ;
+            }
+
+            .Mycho {
+                margin-left: 10px;
+                width: 20px;
+                height: 20px;;
+            }
+        }    
+    }
 
 /*--弹出提醒--*/
-    #AlertWrapper {
-        /*所有右侧弹出提醒对话框的容器*/
+    /*所有右侧弹出提醒对话框的容器*/
+    #alertWrapper {
         position: absolute;
         top: 47px;
         right: 50px;
-
         width: 300px;
-        height: 100%;
-
         z-index: 30;        
     }
-
 
     .alertContainer {
         width: 280px;
         margin-bottom: 6px;
         padding: 10px;
-
         color: #3c763d;
         border-radius: 8px;
         background-color: #fbfbfb;
         box-shadow: 0 0 10px #888;
     }
 
+    /*圆形日历颜色显示*/
     .alertColor {
-        /*圆形日历颜色显示*/
         display: inline-block;
-
         width: 10px;
         height: 10px;
         margin: 0 5px 0 25px;
-
         border-radius: 50%;
         background-color: black;
     }
+    /*提醒标题*/
     .alertTitle {
-        /*提醒标题*/
         font-size: 16px;
-
         color: #555;
     }
+    /*提醒细节*/
     .alertDetail {
         font-size: 14px;
-        /*提醒细节*/
-
         display: block;
-
         margin: 10px 0 5px 45px;
-
         color: #999;
     }
 
+    /*关闭按钮*/
     .close {
-        /*关闭按钮*/
         font-size: 9px;
         font-weight: bold;
         line-height: 15px;
-
         float: right;
-
         width: 15px;
         height: 15px;
-
         cursor: pointer;
         text-align: center;
-
         color: #fff;
         border-radius: 50%;
         background-color: #c2c2c2;
     }
 
-    .fade-transition {
-        transition: opacity .3s ease;
-    }
-    .fade-enter,
-    .fade-leave {
-        opacity: 0;
-    }
-
-
 /*--勾选全天时，设置提醒的弹出框--*/
     #allDayAlertSelect {
         overflow: hidden;
-
         position: absolute;
-        /*top: 376px; */
-        /*left: 120px;*/
         z-index: 30;
-
         margin: 10px;
         border: 1px solid #ccc;
         border-radius: 10px;
         padding-top: 12px;
         padding-bottom: 33px;
         width: 240px;
-
         background: #fff;
     }
 
     .allDayAlertSelect_content {
         position: relative;
         top: 1px;
-
         border-top: 1px solid #ccc;
         border-bottom: 1px solid #ccc;
         padding: 0 7% ;
@@ -135,23 +381,17 @@ html, body, #vue_comps {
     .allDayAlertSelect_content li {
         position: relative;
         top: 1px;
-
         border-bottom: 1px solid #ccc;
         padding-left: 30px;
         height: 38px;
-
         font-size: 17px;
         line-height: 38px;
-
         cursor: pointer;
     }
 
-    .allDayAlertSelect_content li.active {
-        background: url(../images/spanbj-1.png) no-repeat 6px 9px;
-    }
+    .allDayAlertSelect_content li.active { background: url(../images/spanbj-1.png) no-repeat 6px 9px; }
 
     .allDayAlertSelect_time {
-        /*display: none;*/
         margin-top: 30px;
         padding: 0 7%;
         width: 86%;
@@ -159,36 +399,29 @@ html, body, #vue_comps {
 
     .allDayAlertSelect_timeTXT {
         position: absolute;
-
         margin: 0 0 0 35px;
     }
 
     .timeWrapper {
         float: left;
-
         margin-right: 7px;
-
         line-height: 30px;
     }
 
     .timeCenter {
         float: left;
-
         margin-right: 5px;
         border: 1px solid #ccc;
         border-radius: 5px;
         width: 60px;
         height: 30px;
-
         line-height: 30px;
     }
 
     .timeCenter span {
         float: left;
-
         position: relative;
         top: -1px;
-
         border-top: 1px solid #ccc;
         width: 30%;
         height: 15px;
@@ -196,20 +429,14 @@ html, body, #vue_comps {
 
     .timeCenter input {
         float: left;
-
         border-radius: 5px;
         width: 65%;
-
         text-align: center;
     }
 
-    .timeUp {
-        background: url(../images/headerBtnTop.png) no-repeat center center;
-    }
+    .timeUp { background: url(../images/headerBtnTop.png) no-repeat center center; }
 
-    .timeDown {
-        background: url(../images/headerBtnBottom.png) no-repeat center center;
-    }
+    .timeDown { background: url(../images/headerBtnBottom.png) no-repeat center center; }
 
     .allDayAlertSelect_time input {
         border: none;
@@ -217,11 +444,12 @@ html, body, #vue_comps {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         height: 100%;
-
         text-align: center;
-
         outline: none;
     }
+
+
+
 
 
 

@@ -227,7 +227,7 @@ if (typeof isSettingsAvaible == 'undefined') {
         'version'];
 }
 
-var ignoreServerSettings            = false;
+var ignoreServerSettings            = true;
 var globalFirstHideLoader           = true;
 var globalSyncSettingsSave          = false;
 var globalPreventLogoutSync         = false;
@@ -674,7 +674,7 @@ function getLoggedUser () {
     return globalAccountSettings[0];
 }
 
-function login () {
+function login() {
     // 功能：登录函数，显示 $('#LoginLoader') ，
     //      将用户名和密码分别使用 globalLoginUsername 和 globalLoginPassword 保存，之后调用 loadConfig 函数
     // 输入：无
@@ -687,9 +687,13 @@ function login () {
         loadConfig();
     });
 
+    // if (Contacts.userData.length === 0) {
+    //     Contacts.userData = globalUserData.concat();
+    //     Contacts.groupData = globalGroupData.concat();
+    // }
 }
 
-function logout (forceLogout) {
+function logout(forceLogout) {
     // 功能：登出函数
     // 输入：forceLogout
     // 输出：无
@@ -700,7 +704,11 @@ function logout (forceLogout) {
     $('#ResourceCalDAVList > .myListItem').remove();
     $('#ResourceCalDAVList > .othersListItem').remove();
     globalDefaultCalendar = null;
-    addContacts();
+    AlertWrapper.alertItems = [];
+    // globalUserData = [];
+    // globalGroupData = [];
+    // Contacts.userData = [];
+    // Contacts.groupData = [];
 
     if ((typeof forceLogout=='undefined' || forceLogout==null ) && 
         ((isAvaible('CardDavMATE')&&(globalCardDAVInitLoad||globalCardDAVResourceSync)) || 
@@ -718,7 +726,7 @@ function logout (forceLogout) {
         globalFirstLoadNextApp = false;
     }
     settingsLoaded              = false;
-    ignoreServerSettings        = false;
+    ignoreServerSettings        = true;
     //save settings
     // checkBeforeClose (false);
     globalResourceIntervalID    = null;
@@ -961,7 +969,7 @@ function loadConfig () {
             //  $('#Logout').css('display', 'block');
             // }
 
-            netCheckAndCreateConfiguration (globalNetworkCheckSettings);
+            netCheckAndCreateConfiguration(globalNetworkCheckSettings);
             return true;
         }
     }
@@ -999,7 +1007,7 @@ function loadConfig () {
             else {
                 $('#Logout').css('display', 'block');
             }
-            netLoadConfiguration (globalNetworkAccountSettings);
+            netLoadConfiguration(globalNetworkAccountSettings);
             return true;
         }
     }
@@ -1205,46 +1213,6 @@ function globalMain () {
         globalMainCalDAV();
         mainCalDAV();
     }
-    //var alisy=document.getElementsByClassName('myListItem');
-    //var oBtn=document.getElementById('ceshi');
-    //oBtn.onclick=function(){
-    //  alert(alisy.length);
-    //};
-
-    /**********************************************************
-        set login screen logo
-        if (isAvaible('CalDavZAP') && !isAvaible('CardDavMATE')) {
-            $('[data-size="login_logo"]').find('img').attr('src', "images/cdz_logo.svg");
-            $('#LoginPage').find('.footer').text('CalDavZAP - the open source CalDAV web client');
-        }
-        else if (isAvaible('CardDavMATE') && !isAvaible('CalDavZAP')) {
-            $('[data-size="login_logo"]').find('img').attr('src', "carddavmate/images/cdm_logo.svg");
-            $('#LoginPage').find('.footer').text('CardDavMATE - the open source CardDAV web client');
-        }
-        else {
-            $('#Login').css('margin-top', '41px');
-            $('[data-size="login_logo"]').find('img').attr('src', "images/infcloud_logo.svg");
-            $('#LoginPage').find('.footer').text('InfCloud - the open source CalDAV/CardDAV web client');
-        }
-
-        if (isAvaible('Projects')) {
-            globalMainProjects();
-            mainProjects();
-        }
-        if (isAvaible('CardDavMATE')) {
-            globalMainCardDAV();
-            mainCardDAV();
-        }
-        if (isAvaible('Reports')) {
-            globalMainReports();
-            mainReports();
-        }
-        if (isAvaible('Settings')) {
-            globalMainSettings();
-            mainSettings();
-        }
-    */
-
     init();
 }
 
@@ -1973,7 +1941,7 @@ function setCalendarNumber (initSearch) {
     if ($('.resourceCalDAVTODO_header:visible').length>1 || (!$('.resourceCalDAVTODO_header:visible').length  && $('.resourceCalDAVTODO_item:visible').length>1))
         $('.addRemoveAllCalDAVTODO').show();*/
     if (initSearch) {
-        initSearchEngine ();
+        initSearchEngine();
     }
 
     globalCalendarNumber     = 0;
@@ -1997,107 +1965,6 @@ function setCalendarNumber (initSearch) {
             globalTodoCalendarNumber++;
         }
     }
-}
-
-function bindColorPickerClick (newElement) {
-    // 功能：
-    // 输入：newElement
-    // 输出：无
-    
-    // console.log("①main_func bindColorPickerClick");
-    newElement.click(function(event) {
-        var resourceItems           = null;
-        var collectionType          = null;
-        var resourceSelectedClass   = null;
-
-        if (newElement.parent().hasClass('resourceCalDAV_item')) {
-            if (globalEventCollectionsLoading) {
-                return false;
-            }
-            collectionType = 'event';
-            resourceSelectedClass = 'resourceCalDAV_item_selected';
-            resourceItems = newElement.parent().siblings('.resourceCalDAV_item_selected');
-        }
-        else if (newElement.parent().hasClass('resourceCalDAVTODO_item')) {
-            if (globalTodoCollectionsLoading) {
-                return false;
-            }
-            collectionType = 'todo';
-            resourceSelectedClass = 'resourceCalDAV_item_selected';
-            resourceItems = newElement.parent().siblings('.resourceCalDAV_item_selected');
-        }
-        else if (newElement.hasClass('resourceCardDAVColor')) {
-            if (globalAddressbookCollectionsLoading) {
-                return false;
-            }
-            collectionType = 'addressbook';
-            resourceSelectedClass = 'resourceCardDAV_selected';
-            resourceItems = newElement.parent().parent().siblings().find('.resourceCardDAV_selected');
-        }
-
-        var showInput = event.shiftKey;
-        var colorpicker = $(this).siblings('.colorPicker');
-
-        if (!$(this).hasClass('hasColorpicker')) {
-            $(this).addClass('hasColorpicker');
-            colorpicker.spectrum({
-                chooseText: localization[globalInterfaceLanguage].buttonSave,
-                cancelText: localization[globalInterfaceLanguage].buttonCancel,
-                color: newElement.css('background-color'),
-                showInput: showInput,
-                preferredFormat: 'hex6',
-                move: function(color) {
-                    newElement.css('background', color);
-                },
-                hide: function(color) {
-                    if (newElement.css('background-color') != colorpicker.spectrum('get').toRgbString())
-                        newElement.css('background', colorpicker.spectrum('get').toRgbString());
-                },
-                change: function(color) {
-                    newElement.css('background', color);
-                    if (collectionType == 'event') {
-                        var coll = globalResourceCalDAVList.getEventCollectionByUID ($(this).parent().attr('data-id'));
-                        netSaveProperty (coll, (typeof globalCalendarColorPropertyXmlns!='undefined'&&globalCalendarColorPropertyXmlns!=null&&globalCalendarColorPropertyXmlns!='' ? globalCalendarColorPropertyXmlns : 'http://apple.com/ns/ical/'), 'calendar-color', color.toHexString())
-                    }
-                    else if (collectionType == 'todo') {
-                        var coll = globalResourceCalDAVList.getTodoCollectionByUID($(this).parent().attr('data-id'));
-                        netSaveProperty (coll, (typeof globalCalendarColorPropertyXmlns!='undefined'&&globalCalendarColorPropertyXmlns!=null&&globalCalendarColorPropertyXmlns!='' ? globalCalendarColorPropertyXmlns : 'http://apple.com/ns/ical/'), 'calendar-color', color.toHexString())
-                    }
-                    else if (collectionType == 'addressbook') {
-                        var coll = globalResourceCardDAVList.getCollectionByUID($(this).parent().attr('data-id'));
-                        netSaveProperty (coll, (typeof globalAddrColorPropertyXmlns!='undefined'&&globalAddrColorPropertyXmlns!=null&&globalAddrColorPropertyXmlns!='' ? globalAddrColorPropertyXmlns : 'http://inf-it.com/ns/ab/'),  'addressbook-color', color.toHexString())
-                    }
-                }
-            });
-        }
-        else if (showInput!=colorpicker.spectrum('option', 'showInput')) {
-            colorpicker.spectrum('option', 'showInput',showInput);
-        }
-
-        var container = colorpicker.spectrum('container');
-        if (container.is(':visible')) {
-            colorpicker.spectrum('hide');
-        }
-        else {
-            var offset=$(this).offset();
-            colorpicker.spectrum('show');
-
-            if (event.pageY<$(window).height()/2) {
-                offset.top+=$(this).outerHeight();
-                container.removeClass('sp-inverse');
-            }
-            else {
-                offset.top-=container.outerHeight();
-                container.addClass('sp-inverse');
-            }
-            container.offset(offset);
-        }
-
-        resourceItems.removeClass(resourceSelectedClass);
-        newElement.parent().addClass(resourceSelectedClass);
-
-        return false;
-    });
 }
 
 $(document).ready(globalMain);
@@ -2135,7 +2002,7 @@ $(document).ready(function() {
         // 邀请事件对话框
             else if ($('#invitationEventBox').css('display') === "block") {
                 // 当前操作焦点在邀请事件对话框，
-                $('#invitationEventBox').css('display', 'none');
+                $('#invitationEventBox').fadeOut('slow');
                 $('.ezz').css('z-index', -1);                
             }
 
@@ -2149,57 +2016,55 @@ $(document).ready(function() {
                    netSubscribeCalendar($(this).attr('data-id'), "commonname", $(this).find('strong').html());
                 });
 
-                $('#addOthersCalendarDetail').css('display', 'none');
-                $('.group .myContacts li.active').removeClass('active');
-                $('.ezz').css('z-index', 25);      
+                $('#addOthersCalendarDetail').fadeOut('slow');
+                // $('.myContacts li.active').removeClass('active');
+                Contacts.removeActive();
+                $('.ezz').css('z-index', -1);      
                 $('#addOthersCalendarDetail .others-calendars-ul').html("");             
             }
-            else if ($('#contacts').css('display') === 'block') {
-                $('#contacts').css('display', 'none');
-                $('.ezz').css('z-index', -1);
-                if ($('#event_details_template').parent().css('display') === 'block') {
-                    // 当前操作焦点在联系人对话框(添加邀请人状态)，将选中的联系人加入邀请名单
-                    var tmp_html = "";
-                    var tmp_dataId = "";
-                    $('#contacts .group li.active').each(function() {
-                        // 有勾选的联系人，加入 #addPartnerTxt 中
-                        tmp_html   += "," + $(this).find('span').html();
-                        tmp_dataId += "," + $(this).attr('data-id');
-                    });
-                    if (tmp_html != "") {                    
-                        $('#addPartnerTxt').html(tmp_html.slice(1));
-                        $('#addPartnerTxt').attr('data-id', tmp_dataId.slice(1));
-                    }
-                    $('#contacts .group li.active').removeClass('active');
-                }
-            }
+            // else if (Contacts.isShow === true) {
+            //     // $('#contacts').fadeOut('slow');
+            //     Contacts.isShow = false;
+            //     $('.ezz').css('z-index', -1);
+            //     if ($('#event_details_template').parent().css('display') === 'block') {
+            //         // 当前操作焦点在联系人对话框(添加邀请人状态)，将选中的联系人加入邀请名单
+            //         var tmp_html = "";
+            //         var tmp_dataId = "";
+            //         $('#contacts .group li.active').each(function() {
+            //             // 有勾选的联系人，加入 #addPartnerTxt 中
+            //             tmp_html   += "|" + $(this).find('span').html();
+            //             tmp_dataId += "|" + $(this).attr('data-id');
+            //         });
+            //         if (tmp_html != "") {                    
+            //             $('#addPartnerTxt').html(tmp_html.slice(1));
+            //             $('#addPartnerTxt').attr('data-id', tmp_dataId.slice(1));
+            //         }
+            //         $('#contacts .group li.active').removeClass('active');
+            //     }
+            // }
 
         // 各类设定相关
-            else if ($('.settingMy').css('display') === "block") {
-                // 当前操作焦点在设置默认日历                 
-                $('.settingMy').css('display', 'none');
-                $('.ezz').css('z-index', 25);                    
-            } 
             else if ($('.setting-content').css('display') === 'block') {
                 // 当前操作焦点在偏好设置对话框，将偏好设置对话框隐藏后恢复遮罩层
                 if ($('#noDay').css('display') === 'block') {
                     $('#noDay').css('display', 'none');
+                    $('.ezz').css('z-index', 25);                   
                 }
                 else {                
-                    $('.setting-content').css('display', 'none');
+                    $('.setting-content').fadeOut('slow');
                     $('.ezz').css('z-index', -1);                   
                 }
             } 
             else if ($('#settingsMenu').css('display') === 'block') {
                 // 当前操作焦点在偏好设置菜单，将菜单隐藏后恢复遮罩层
-                $('#settingsMenu').css('display', 'none');
+                $('#settingsMenu').slideUp('slow');
                 $('.ezz').css('z-index', -1);                   
             }
 
         // 新建/编辑日历相关
             if ($('#list_MKCalendar').css('display') === "block") {
                 // 当前操作焦点在新建日历
-                $('#list_MKCalendar').css('display', 'none');
+                $('#list_MKCalendar').hide('slow');
                 $('.ezz').css('z-index', -1);
 
                 // 当作取消处理，恢复原始状态
@@ -2250,7 +2115,7 @@ $(document).ready(function() {
                     }
                 }
 
-                $('#list_EditCalendar').css('display', 'none');
+                $('#list_EditCalendar').hide('slow');
                 $('.ezz').css('z-index', -1);
             }
     });
@@ -2273,17 +2138,18 @@ $(document).ready(function() {
     // 添加他人日历
     $('#othersListHeader .ListHeaderPlus').click(function() {
         // 点击添加他人日历按钮，弹出联系人对话框
-        $('#contacts').css('display', 'block');
-        $('.ezz').css('z-index', 25);
+        Contacts.isShow = true;
+        Contacts.modalZ = 25;        
+        Contacts.mode = 'subscribe';
     });
 
     // 新建我的日历
         $('#myListHeader .ListHeaderPlus').click(function() {
             if ($('#list_MKCalendar').css('display') === 'none') {
-                $('#list_MKCalendar').css('display', 'block');
+                $('#list_MKCalendar').show('slow');
                 $('.ezz').css('z-index', 25);
             } else {
-                $('#list_MKCalendar').css('display', 'none');
+                $('#list_MKCalendar').hide('slow');
             }
         });
 
@@ -2329,10 +2195,10 @@ $(document).ready(function() {
         $('#settings')
             .click(function () {
                 if ($('#settingsMenu').css('display') === 'none') {
-                    $('#settingsMenu').css('display', 'block');
+                    $('#settingsMenu').slideDown('slow');
                     $('.ezz').css('z-index', 25);
                 } else {
-                    $('#settingsMenu').css('display', 'none');
+                    $('#settingsMenu').slideUp('slow');
                 }
             })
             .hover(function() {
@@ -2343,27 +2209,66 @@ $(document).ready(function() {
 
     // 点击设定菜单中的偏好设置
         $('#menu-setting').click(function () {
+            var cals = globalResourceCalDAVList.collections;
+
+            if (!globalResourceCalDAVList.getEventCollectionByUID(globalDefaultCalendar.uid)) {
+                // 如果默认日历已被删除，则重新指定
+                var i = 0;
+                for (i = 0; i < cals.length; i += 1) {
+                    if (!cals[i].isSubscribed) {
+                        // 非他人日历
+                        globalDefaultCalendar = cals[i];
+                        break;
+                    }
+                }
+            }
+            updateSettings();
+            
             if ($('.setting-content').css('display') === 'none') {
-                $('.setting-content').css('display', 'block');
+                $('.setting-content').fadeIn('slow');
                 $('.ezz').css('z-index', 25);
-                $('#settingsMenu').css('display', 'none');
+                $('#settingsMenu').slideUp('slow');
             } else {
-                $('.setting-content').css('display', 'none');
+                $('.setting-content').fadeOut('slow');
             }
         });
 
     // 点击偏好设置中的默认日历
         $('.defaultCalendar').click(function () {
-            if ($('.settingMy').css('display') === "none") {
-                $('.settingMy').css('display', 'block');
-                $('.ezz').css('z-index', 25); 
-            } else {
-                $('.settingMy').css('display', 'none');
+            CalendarSelectWrapper.calendarLiItems = [];  // 清空数组
+
+            CalendarSelectWrapper.isShow = true;
+            CalendarSelectWrapper.modalZ = 27;
+            $('#calendarSelectWrapper').css('left', $(this).offset().left);
+            $('#calendarSelectWrapper').css('top', $(this).offset().top + 29);
+
+            var cals = globalResourceCalDAVList.collections;
+
+            for(var i=0; i<cals.length; i++) {
+                if (cals[i].uid != undefined && !cals[i].isSubscribed) {
+                    // 新增排除他人日历
+                    var newCalendar = new Object();
+                    newCalendar.uid = cals[i].uid;
+                    newCalendar.isActive = false;
+                    newCalendar.color = cals[i].ecolor;
+                    newCalendar.title = cals[i].displayvalue;
+                    newCalendar.isShare = true;
+
+                    if (cals[i].uid === globalDefaultCalendar.uid) {
+                        newCalendar.isActive = true;
+                        CalendarSelectWrapper.activeNum = CalendarSelectWrapper.calendarLiItems.length;
+                    }
+                    if (!cals[i].isShared) {
+                        newCalendar.isShare = false;
+                    }
+
+                    CalendarSelectWrapper.calendarLiItems.push(newCalendar);
+                }
             }
         });
 
         $('#menu-logout').click(function () {
-            $('#settingsMenu').css('display', 'none');
+            $('#settingsMenu').slideUp('slow');
             $('.ezz').css('z-index', -1); 
             logout();
         });
@@ -2416,85 +2321,7 @@ $(document).ready(function() {
             $('#SettingsAlertOnOff span.active').removeClass('active');
             $(this).addClass('active');
         });
-
-    addContacts();
 });
-
-function addContacts() {
-    /* 功能：根据 users_data.js 中的静态数据，通过两层循环生成联系人对话框
-     * 输入：无
-     * 输出：无
-    */
-
-    $('#contacts .borderSpan ~ div').remove(); // 清空
-
-    // 1. 根据 globalUsersGroup 中的数据，生成组（第一层）
-    var tmp_group = "";
-    // originUserDataTOglobalUsersData(originUserData, 0)
-
-    // searchGroupsData(globalGroupssUrl);
-
-    for (var i = 0; i < globalUsersGroup.length; i++) {
-        // 2. 根据 globalUsersGroup 中的数据，生成组（第二层）
-        var tmp_li = "";
-        for (var j = 0; j < globalUsersGroup[i].users.length; j++) {
-            var tmp_uid = globalUsersGroup[i].users[j]; // globalUsersData 中的下标
-            tmp_li += "<li data-id='" + globalUsersData[tmp_uid].uid+ "'>" +
-                        "<span>" + globalUsersData[tmp_uid].name + "</span>" +
-                        "<img src='images/list_item.png'>" +
-                    "</li>";
-        }
-
-        tmp_group += "<div class='group' data-id='"+ globalUsersGroup[i].uid + "'>" +
-                        "<div class='groupContainer'>" +
-                            "<span class='groupTitle'>" + globalUsersGroup[i].name+ "</span>" +
-                            "<span class='groupCount'>(" + globalUsersGroup[i].users.length + ")</span>" +                
-                        "</div>" +
-                        
-                        "<ul class='myContacts'>" + tmp_li + "</ul>" + 
-                    "</div>"
-    }
-
-    $('#contacts .borderSpan').after($(tmp_group));
-
-    // 添加交互事件
-        $('.groupTitle').click(function() {
-            // 点击联系人群组的一级标题菜单（如业务所），实现显示/收起效果，并且若是已有打开的其他一级菜单，则将其收起
-            // $(this).parent().next()：就是二级菜单，具体的个人信息
-            
-            if ($(this).parent().next().css('display') === 'none') {
-                $('.myContacts').css('display', 'none'); // 将二级菜单全部收起
-                $(this).parent().next().css('display', 'block');
-                $(this).parent().css('background', 'url(../images/headerBtnBottom.png) no-repeat 3px 11px');
-            } 
-            else {
-                $(this).parent().next().css('display', 'none');
-                $(this).parent().css('background', 'url(../images/btn_arrow_next.png) no-repeat 7px 7px');
-            }
-        });
-
-        $('.group .myContacts li').click(function() {
-            // 点击二级菜单中的具体的某个人，调用 netSearchCalendar 函数查询该用户的日历，
-            // 查询成功后弹出他人日历列表对话框
-            // 「待完成：在日历列表对话框中显示正在查询的标志」
-
-            if ($(this).hasClass('active')) {
-                $(this).removeClass('active');
-            }
-            else {
-                $(this).addClass('active');
-            }
-
-            if ($('#event_details_template').parent().css('display') === 'none') {
-                // 当前操作焦点在联系人对话框(不是添加邀请人状态)
-                var tmp_email = globalUsersData[parseInt($(this).attr('data-id'))].e_mail;
-                netSearchCalendar(tmp_email);
-
-                $('#addOthersCalendarDetail').css('display', 'block');
-                $('.ezz').css('z-index', 27);
-            } 
-        });
-}
 
 $(document).ready(function() {
     $(window).resize (function (evt) {
@@ -2566,7 +2393,7 @@ $(document).ready(function() {
                     updateEventFormDimensions(true);
                     // $('#CAEvent.saveLoader').show();
                     // console.log(globalCalEvent.id);
-                    deleteVcalendarFromCollection(globalCalEvent.id,'vevent');
+                    deleteVcalendarFromCollection(globalCalEvent.id, 'vevent');
                     hideEventPopup();
                 }
             break;
@@ -2612,71 +2439,5 @@ $(document).ready(function() {
     };
 });
 
-// --- vue ---
-// var AllDayAlertSelect = new Vue({
-//     // 勾选全天时，设置提醒的弹出框
-//     el: '#allDayAlertSelect',
-//     data: {
-//         isShow: false,      // 自身是否显示
-//         isDIY: false,       // 无/自定义
-//         timeTXT: '',        // 动态显示自定义时间
-//         dayCount: 0,        // 提前几天
-//         timeDayTXT: '天前', // 文本
-//         hourCount: 0,       // 提前几小时
-//         timeHourTXT: '时',  // 文本
-//     },
-//     computed: {
-//         timeTXT: function() {
-//             return this.dayCount + this.timeDayTXT + this.hourCount + this.timeHourTXT;
-//         }
-//     },
-//     components: {
-//         // 复用的时间选择组件
-//         time_count_component: {
-//             props: {
-//                 // 传入参数
-//                 count: {
-//                     type: Number, 
-//                     twoWay: true,
-//                 },
-//                 time_txt: String, 
-//                 count_type: String,
-//             },
-//             template: '#time-count-template',
-//             filters: {
-//                 // 过滤器
-//                 numberDisplay: {
-//                     // 利用timeLimit函数保证合法范围，parseInt过滤小数,write表示将过滤后的变量保存
-//                     // （由于双向绑定，input中的内容是过滤后的正确值）
-//                     write: function(val, oldval) {
-//                         return this.timeLimit(val, this.count_type) ? parseInt(val) : 0;
-//                     },
-//                 },
-//             },
-//             methods: {
-//                 // 增加时间需要验证范围
-//                 addTime: function() {
-//                     this.count = this.timeLimit(this.count+1, this.count_type) ? this.count+1 : this.count;    
-//                 },
-//                 timeLimit: function(val, countType) {
-//                     /* 功能：根据countType验证val是否在范围内(非数字不在范围内)
-//                      * 输入：val: count值, 
-//                      *      countType: 当前组件的类型,
-//                      * 输出：无
-//                     */
-//                     if (countType === 'hour') {
-//                         return val >= 0 && val < 24;
-//                     } 
-//                     else if (countType === 'day') {
-//                         return val >= 0 && val < 100;
-//                     }
-//                     else {
-//                         return val >= 0;
-//                     }
-//                 },
-//             },
-//         },
-//     },
-// });
 
 

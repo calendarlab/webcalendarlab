@@ -1,0 +1,65 @@
+@charset "utf-8";
+@import "css3";
+
+/*-------------他人日历列表部分---------------------*/
+#addOthersCalendarDetail {
+    display: none;
+    position: absolute;
+    top: 10%;
+    left: 34%;
+    z-index: 32;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0 10px;
+    width: 380px;
+    height: 402px;
+    background-color: #fbfbfb;
+    box-shadow: 1px 1px 10px #969696;
+}
+#addOthersCalendarDetail p {
+    height: 45px;
+    font-size: 20px;
+    line-height: 45px;
+    text-align: center;
+    color: #999;
+}
+.others-calendars-ul {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0 10px;
+    width: 358px;
+    background-color: #fff;
+}
+.others-calendars-ul li {
+    overflow: hidden;
+    position: relative;
+    top: 1px;
+    border-bottom: 1px solid #ccc;
+    line-height: 39px;
+    background: url(../images/ToBeChosen_contact.png) no-repeat 0 8px;
+}
+.others-calendars-ul li.active {
+    background: url(../images/chosen_contact.png) no-repeat 0 8px;
+}
+.others-calendars-ul strong {
+    float: left;
+    overflow: hidden;
+    padding-left: 25px;
+    width: 195px;
+    font-size: 16px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #555;
+    cursor: pointer;
+}
+
+.others-calendars-ul span {
+    margin-left: 5px;
+    font-size: 14px;
+    color: #999;
+    width: 70px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+

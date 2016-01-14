@@ -279,9 +279,9 @@ function netSearchCalendar (match) {
                     '</D:principal-property-search>';
 
     function ajaxComplete_Search (data, textStatus, xml) {
-        // 功能：1.保存搜索后返回的用户的 href              ：uuid；
-        //                             displayname        ：用户名；
-        //                             calendar-user-type ：用户类型；
+        // 功能：1.保存搜索后返回的用户的 href               ：uuid；
+        //                            displayname        ：用户名；
+        //                            calendar-user-type ：用户类型；
         //      2.发送 propfind 请求，获取该用户已共享的日历
         // 输入：data, 
         //      textStatus, 
@@ -367,7 +367,7 @@ function netSearchCalendar (match) {
                                             $(el).children('propstat').children('prop').children('displayname').text() + 
                                         "</strong>" +
                                         "<span class='otherCalendarUser'>" + 
-                                            $('.group .myContacts li.active span').html() + 
+                                            $('.contactContent li.active span').html() + 
                                         "</span>" +
                                         "<span class='otherCalendarIsShared'>共享日历</span>" +
                                     "</li>"
@@ -423,7 +423,7 @@ function netSearchCalendar (match) {
             req.setRequestHeader('Depth', '0');
         },
         error: function (objAJAXRequest, strError) {
-            console.log("Error: [netDeleteCalendar: 'report " + globalAccountSettings[0].cahref + "'] code: '" + 
+            console.log("Error: [netSearchCalendar: 'report " + globalAccountSettings[0].cahref + "'] code: '" + 
                 objAJAXRequest.status+"' status: '"+strError+"'" + 
                 (objAJAXRequest.status==0 ? ' (this error code usually means network connection error,' + 
                     ' or your browser is trying to make a cross domain query,' + 
@@ -466,6 +466,7 @@ function netDeleteCalendar (inputCollection) {
             // req.setRequestHeader('Depth', '0');
         },
         error: function (objAJAXRequest, strError) {
+
             console.log("Error: [netDeleteCalendar: 'DELETE " + inputCollection.url+inputCollection.href+"'] code: '" + 
                 objAJAXRequest.status+"' status: '"+strError+"'" + 
                 (objAJAXRequest.status==0 ? ' (this error code usually means network connection error,' + 
@@ -610,17 +611,11 @@ function netSaveProperty (inputCollection, hrefProperty, inputProperty, inputVal
                 // 日历颜色
                 if (inputCollection.listType == 'vevent') {
                     $('#ResourceCalDAVList').find('[data-id="'+inputCollection.uid+'"]').find('.resourceCalDAVColor').css('background', inputCollection.ecolor);
-                    // $('#ResourceCalDAVList').find('[data-id="'+inputCollection.uid+'"]').find('.colorPicker').spectrum('set', inputCollection.ecolor);
                 }
                 else {
                     $('#ResourceCalDAVTODOList').find('[data-id="'+inputCollection.uid+'"]').find('.resourceCalDAVColor').css('background',inputCollection.ecolor);
-                    // $('#ResourceCalDAVTODOList').find('[data-id="'+inputCollection.uid+'"]').find('.colorPicker').spectrum('set',inputCollection.ecolor);
                 }
             }
-            // else if (inputProperty == 'addressbook-color') {
-            //  $('#ResourceCardDAVList').find('[data-id="'+inputCollection.uid+'"]').find('.resourceCardDAVColor').css('background',inputCollection.color);
-            //  $('#ResourceCardDAVList').find('[data-id="'+inputCollection.uid+'"]').find('.colorPicker').spectrum('set',inputCollection.color);
-            // }
             return false;
         },
         success: function (data, textStatus, xml) {
@@ -758,12 +753,12 @@ function netCheckAndCreateConfiguration (configurationURL) {
 
             if (count) {
                 if (globalAccountSettings[0].delegation) {
-                    DAVresourceDelegation (globalAccountSettings[0], 0, 0);
+                    DAVresourceDelegation(globalAccountSettings[0], 0, 0);
                 }
                 else {
                     // start the client
                     if (isAvaible('CalDavZAP')) {
-                        runCalDAV ();
+                        runCalDAV();
                     }
                     // if (isAvaible('CardDavMATE')) {
                     //  runCardDAV ();
@@ -776,11 +771,15 @@ function netCheckAndCreateConfiguration (configurationURL) {
                     // }
 
                     globalResourceNumber = globalAccountSettings.length;
-                    loadAllResources ();
+                    loadAllResources();
                 }
             }
             else {
                 $('#LoginLoader').fadeOut(1200);
+            }
+
+            if (globalUserData.length === 0 && globalGroupData.length === 0) {
+                searchContactData();
             }
         }
     });
@@ -1697,7 +1696,7 @@ function netFindResource (inputResource, inputResourceIndex, forceLoad, indexR, 
             if ($('#ResourceCalDAVList .resourceCalDAV_item:visible').not('.resourceCalDAV_item_ro').length==0) {
                 // console.log("dnone...");
                 $('#eventFormShower').css('display','none');
-                $('#calendar').fullCalendar('setOptions',{'selectable':false});
+                $('#calendar').fullCalendar('setOptions',{'selectable':true});
             }
             else {
                 // console.log("dblock...");
@@ -1917,7 +1916,7 @@ function netFindResource (inputResource, inputResourceIndex, forceLoad, indexR, 
                 var settings = $(xml.responseXML).children().filterNsNode('multistatus').children().filterNsNode('response')
                     .children().filterNsNode('propstat').children().filterNsNode('prop').children().filterNsNode('settings').text();
 
-                if (typeof globalPreviousSupportedSettings !='undefined' && globalPreviousSupportedSettings!=null) {
+                if (settings != '' && typeof globalPreviousSupportedSettings !='undefined' && globalPreviousSupportedSettings!=null) {
                     loadSettings (settings, true, true);
                 }
                 if (isAvaible('CardDavMATE')) {
@@ -2024,14 +2023,15 @@ function netLoadResource (inputResource, inputHref, hrefMode, inputResourceIndex
         for (var k=0; k<globalSubscribedCalendars.calendars.length; k++) {
             color = globalSubscribedCalendars.calendars[k].color;
             if (color == '') {
-                var par     = (uidBase+globalSubscribedCalendars.calendars[k].href).split('/');
-                var hash    = hex_sha256(hex_sha256(par[par.length-3]+'/'+par[par.length-2]+'/'));
-                var hex     = hash.substring(0,6);
+                // 设置默认颜色
+                // var par     = (uidBase+globalSubscribedCalendars.calendars[k].href).split('/');
+                // var hash    = hex_sha256(hex_sha256(par[par.length-3]+'/'+par[par.length-2]+'/'));
+                // var hex     = hash.substring(0,6);
 
-                while (checkColorBrightness(hex) >= 252) {
-                    hex = hex_sha256(hex_sha256(hash)).substring(0,6);
-                }
-                color = '#' + hex;
+                // while (checkColorBrightness(hex) >= 252) {
+                //     hex = hex_sha256(hex_sha256(hash)).substring(0,6);
+                // }
+                color = '#2e71e3';
             }
 
             var syncRequired    = true;
@@ -2407,14 +2407,15 @@ function netLoadResource (inputResource, inputHref, hrefMode, inputResourceIndex
                         } 
 
                         if (color == '') {
-                            var par     = (uidBase+href).split('/');
-                            var hash    = hex_sha256(hex_sha256(par[par.length-3]+'/'+par[par.length-2]+'/'));
-                            var hex     = hash.substring(0,6);
+                            // var par     = (uidBase+href).split('/');
+                            // var hash    = hex_sha256(hex_sha256(par[par.length-3]+'/'+par[par.length-2]+'/'));
+                            // var hex     = hash.substring(0,6);
 
-                            while(checkColorBrightness(hex) >= 252) {
-                                hex = hex_sha256(hex_sha256(hash)).substring(0,6);
-                            }
-                            color = '#'+hex;
+                            // while(checkColorBrightness(hex) >= 252) {
+                            //     hex = hex_sha256(hex_sha256(hash)).substring(0,6);
+                            // }
+                            // 设置默认颜色
+                            color = '#2e71e3';
                         }
                         var ignoreAlarms = false;
                         var uidPArts     = (uidBase+href).split('/');
@@ -2454,11 +2455,13 @@ function netLoadResource (inputResource, inputHref, hrefMode, inputResourceIndex
                             // 新增4个属性： isSubscribed:   是否为订阅日历（区分我的日历和他人日历）;
                             //              isShared:       是否为共享日历（是否别人可订阅）；
                             //              origin_user:    存储订阅日历来源用户；
+                            //              origin_uid:     存储订阅日历来源 uid；
                             //              origin_address: 存储订阅日历来源地址；
 
                             var tmp_isSubscribed   = false;
                             var tmp_isShared       = false;
                             var tmp_origin_user    = '';
+                            var tmp_origin_uid    = '';
                             var tmp_origin_address = '';
                             var re                 = new RegExp('^(https?://)([^/]+)(.*)','i');
                             var tmp                = globalAccountSettings[0].cahref.match(re);
@@ -2467,7 +2470,8 @@ function netLoadResource (inputResource, inputHref, hrefMode, inputResourceIndex
                             if (resources.children().filterNsNode('resourcetype').children().filterNsNode('shared').length > 0) {
                                 tmp_isSubscribed = true;
                                 tmp_origin_user = resources.find('organizer').children('common-name').text();
-                            tmp_origin_address = baseHref + resources.find('shared-url').children('href').text() + '/';
+                                tmp_origin_uid = resources.find('shared-url').children('href').text().split('/')[3];
+                                tmp_origin_address = baseHref + resources.find('shared-url').children('href').text() + '/';
                             }
 
                             resources.children().filterNsNode('acl').children().filterNsNode('ace').each(function(index, el) {
@@ -2539,8 +2543,9 @@ function netLoadResource (inputResource, inputHref, hrefMode, inputResourceIndex
                             }
 
                             var tmp_newobj = {  isSubscribed:       tmp_isSubscribed,
-                                                isShared:           tmp_isShared, 
+                                                isShared:           tmp_isShared,  
                                                 origin_user:        tmp_origin_user, 
+                                                origin_uid:         tmp_origin_uid, 
                                                 origin_address:     tmp_origin_address, 
                                                 makeLoaded:         toBeLoad, 
                                                 typeList:           typeList, 
@@ -2755,13 +2760,15 @@ function netLoadResource (inputResource, inputHref, hrefMode, inputResourceIndex
                             }
 
                             if (color == '') {
-                                var par     = (uidBase+href).split('/');
-                                var hash    = hex_sha256(hex_sha256(par[par.length-3]+'/'+par[par.length-2]+'/'));
-                                var hex     = hash.substring(0,6);
-                                while (checkColorBrightness(hex) >= 252) {
-                                    hex = hex_sha256(hex_sha256(hash)).substring(0,6);
-                                }
-                                color = '#'+hex;
+                                // var par     = (uidBase+href).split('/');
+                                // var hash    = hex_sha256(hex_sha256(par[par.length-3]+'/'+par[par.length-2]+'/'));
+                                // var hex     = hash.substring(0,6);
+                                // while (checkColorBrightness(hex) >= 252) {
+                                //     hex = hex_sha256(hex_sha256(hash)).substring(0,6);
+                                // }
+                                // color = '#'+hex;
+                                // 设置默认颜色
+                                color = '#2e71e3';
                             }
 
                             var checkContentType    = (inputResource.checkContentType==undefined ? true : inputResource.checkContentType);
@@ -3223,6 +3230,7 @@ function deleteVcalendarFromCollection(inputUID, inputForm, putMode) {
         data: '',
         dataType: 'text',
         error: function(objAJAXRequest, strError) {
+            $('#eventLoader').hide();
             console.log("Error: [deleteVcalendarFromCollection: 'DELETE " + put_href + "']: code: '" + objAJAXRequest.status + "' status: '" + strError + "'" +
                 (objAJAXRequest.status == 0 ? ' - see https://www.inf-it.com/' + globalAppName.toLowerCase() + '/readme.txt (cross-domain setup)' : ''));
             switch (objAJAXRequest.status) {
@@ -3254,12 +3262,15 @@ function deleteVcalendarFromCollection(inputUID, inputForm, putMode) {
             return false;
         },
         success: function(data, textStatus, xml) {
-            $('#invitationEventBox').find('div.box-con1-one').each(function() {
-                if ($(this).attr('data-id') === inputUID) {
-                    // 找到界面上对应的元素
-                    $(this).remove();
-                } 
-            });
+            var i = 0;
+            for (i = 0; i < InvitationEventBox.partOldItems.length; i += 1) {
+                if (InvitationEventBox.partOldItems[i].uid === inputUID) {
+                    // 删除对应事件
+                    InvitationEventBox.partOldItems.splice(i, 1);
+                    break;
+                }
+            }
+
             if (inputForm == 'vevent') {
                 globalEventList.removeOldEvent(inputUID, true, true);
             }
@@ -3276,6 +3287,7 @@ function deleteVcalendarFromCollection(inputUID, inputForm, putMode) {
                     //{
                     $('#show').val('');
                     $('#CAEvent').hide();
+                    $('#eventLoader').hide();
                     $('#event_details_template').remove();
                     $('#CAEvent').append(cleanVcalendarTemplate);
                     $('#EventDisabler').fadeOut(globalEditorFadeAnimation, function() {
@@ -3524,8 +3536,9 @@ function putVcalendarToCollection(accountUID, inputUID, inputEtag, inputVcalenda
         var errBegin = localization[globalInterfaceLanguage].errUnableSaveTodoBeginCalDAV;
     }
     var collection = globalResourceCalDAVList.getEventCollectionByUID(collection_uid);
-    if (collection == null)
+    if (collection == null) {
         collection = globalResourceCalDAVList.getTodoCollectionByUID(collection_uid);
+    }
     var vcalendarList = new Array();
 
     $.ajax({
@@ -3538,14 +3551,18 @@ function putVcalendarToCollection(accountUID, inputUID, inputEtag, inputVcalenda
         },
         timeout: resourceSettings.timeOut,
         beforeSend: function(req) {
-            if (globalSettings.usejqueryauth.value != true && resourceSettings.userAuth.userName != '' && resourceSettings.userAuth.userPassword != '')
+            if (globalSettings.usejqueryauth.value != true && resourceSettings.userAuth.userName != '' && resourceSettings.userAuth.userPassword != '') {
                 req.setRequestHeader('Authorization', basicAuth(resourceSettings.userAuth.userName, resourceSettings.userAuth.userPassword));
+            }
 
             req.setRequestHeader('X-client', globalXClientHeader);
-            if (inputEtag != '')
+            if (inputEtag != '') {
                 req.setRequestHeader('If-Match', inputEtag);
-            else // adding new object
+            }
+            else {
+                // adding new object
                 req.setRequestHeader('If-None-Match', '*');
+            } 
         },
         username: (globalSettings.usejqueryauth.value == true ? resourceSettings.userAuth.userName : null),
         password: (globalSettings.usejqueryauth.value == true ? resourceSettings.userAuth.userPassword : null),
@@ -3588,14 +3605,18 @@ function putVcalendarToCollection(accountUID, inputUID, inputEtag, inputVcalenda
             if (inputForm == 'vevent' && globalRevertFunction != null) {
                 globalRevertFunction();
                 globalRevertFunction = null
-            } else if (inputForm == 'vtodo')
+            } else if (inputForm == 'vtodo') {
                 globalTodoLoaderHide = '';
+            }
+
+            $('#eventLoader').hide();
             return false;
         },
         success: function(data, textStatus, xml) {
             globalRevertFunction = null;
-            if (delUID != '')
+            if (delUID != '') {
                 deleteVcalendarFromCollection(delUID, inputForm, true);
+            }
 
             if (typeof(textArray) != "undefined") {
                 if (textArray.length > 0) {
@@ -3604,27 +3625,22 @@ function putVcalendarToCollection(accountUID, inputUID, inputEtag, inputVcalenda
                     putVcalendarToCollection(accountUID, inputUID.substring(0, inputUID.lastIndexOf('/') + 1), '', tArr, delUID, inputForm, isFormHidden, deleteMode, textArray)
                 }    
             } 
-
-            $('#invitationEventBox').find('div.box-con1-one').each(function() {
-                if ($(this).attr('data-id') === inputUID) {
-                    // 找到界面上对应的元素
-                    $(this).remove();
-                } 
-            });
             
             var newEtag = xml.getResponseHeader('Etag');
             var isTODO = false;
             globalWindowFocus = false;
             if (inputForm == 'vevent') {
                 var eventSuccessMessage = localization[globalInterfaceLanguage].txtAllSaved;
-                if (deleteMode)
+                if (deleteMode) {
                     eventSuccessMessage = localization[globalInterfaceLanguage].txtAllDeleted;
+                }
 
                 show_editor_loader_messageCalendar(inputForm, 'message_success', eventSuccessMessage, function(a) {
                     //setTimeout(function() {
                     $('#show').val('');
                     if (isFormHidden != true) {
                         $('#CAEvent').hide();
+                        $('#eventLoader').hide();
                         $('#calendar').fullCalendar('unselect');
                         $('#event_details_template').remove();
                         $('#CAEvent').append(cleanVcalendarTemplate);
@@ -3634,20 +3650,8 @@ function putVcalendarToCollection(accountUID, inputUID, inputEtag, inputVcalenda
                     }
                     //}, a);
                 });
-            } else {
-                if (newEtag != null) {
-                    if (deleteMode)
-                        globalTodoLoaderHide = localization[globalInterfaceLanguage].txtAllDeletedTodo;
-                    show_editor_loader_messageCalendar(inputForm, 'message_success', globalTodoLoaderHide, function(a) {
-                        globalTodoLoaderHide = '';
-                        if (inputForm == 'vtodo' && isFormHidden != true)
-                            $('#showTODO').val('');
-                        $('#TodoDisabler').fadeOut(globalEditorFadeAnimation, function() {
-                            $('#timezonePickerTODO').prop('disabled', false);
-                        });
-                    });
-                }
-            }
+            } 
+
             if (newEtag != null) {
                 rid = inputUID.substring(0, inputUID.lastIndexOf('/') + 1);
                 if (inputForm == 'vevent') {
@@ -3679,45 +3683,9 @@ function putVcalendarToCollection(accountUID, inputUID, inputEtag, inputVcalenda
                             break;
                         }
                     }
-                } else {
-                    var resources = globalResourceCalDAVList.TodoCollections;
-                    for (var j = 0; j < resources.length; j++) {
-                        if (rid == resources[j].uid) {
-                            if (inputVcalendar != '')
-                                var vcalendar_clean = vCalendarCleanup(inputVcalendar);
-                            else
-                                return true;
-                            if (inputForm == 'vtodo' && isFormHidden != true) {
-                                $('#showTODO').val(inputUID);
-                            }
-                            var tmp_inputevent = {
-                                isRepeat: false,
-                                isTODO: false,
-                                untilDate: '',
-                                sortStart: '',
-                                start: '',
-                                end: '',
-                                sortkey: '',
-                                timestamp: resultTimestamp,
-                                accountUID: resources[j].accountUID,
-                                uid: inputUID,
-                                displayValue: resources[j].displayvalue,
-                                etag: newEtag,
-                                vcalendar: vcalendar_clean
-                            };
-
-                            globalEventList.insertEvent(true, resources[j], tmp_inputevent, true, false, false);
-                            if (inputEtag == '') {
-                                if (isFormHidden)
-                                    $('#todoList').fullCalendar('allowSelectEvent', true);
-                                else
-                                    $('#todoList').fullCalendar('selectEvent', $('[data-id="' + inputUID + '"]'));
-                            }
-                            break;
-                        }
-                    }
-                }
-            } else {
+                } 
+            } 
+            else {
                 if (inputForm == 'vevent') {
                     if (typeof(textArray) != "undefined") {
                         netLoadCalendar(globalResourceCalDAVList.getEventCollectionByUID(collection_uid), [{
@@ -3733,18 +3701,10 @@ function putVcalendarToCollection(accountUID, inputUID, inputEtag, inputVcalenda
                             }], (collection.forceSyncPROPFIND == undefined || collection.forceSyncPROPFIND == false ? true : false),
                             false, true, false, true, null, null, true);
                     }
-                } else {
-                    if (inputForm == 'vtodo' && isFormHidden != true) {
-                        $('#showTODO').val(inputUID);
-                    }
-                    netLoadCalendar(globalResourceCalDAVList.getTodoCollectionByUID(collection_uid), [{
-                            etag: '',
-                            href: put_href_part
-                        }], (collection.forceSyncPROPFIND == undefined || collection.forceSyncPROPFIND == false ? true : false),
-                        false, true, false, true, null, null);
-                }
+                } 
             }
             globalWindowFocus = true;
+            $('#EventDisabler').hide();
             return true;
         }
     });
@@ -3821,7 +3781,7 @@ function CalDAVnetLoadCollection (inputCollection, forceLoad, allSyncMode, recur
                                 globalCalDAVInitLoad) || 
                             !globalCalDAVInitLoad) {
 
-                            updateMainLoader ();
+                            updateMainLoader();
                         }
                     }
                     else if (globalOnlyCalendarNumberCount==globalOnlyCalendarNumber || 
@@ -3890,7 +3850,7 @@ function CalDAVnetLoadCollection (inputCollection, forceLoad, allSyncMode, recur
                 globalAccountSettings[inputCollection.resourceIndex].todoNo==0 && 
                 globalCalDAVInitLoad) {
 
-                updateMainLoader ();
+                updateMainLoader();
             }
         }
         else if (globalOnlyCalendarNumberCount==globalOnlyCalendarNumber || globalOnlyTodoCalendarNumberCount==globalTodoCalendarNumber) {

@@ -588,9 +588,7 @@ function ResourceCalDAVList() {
                         $('#list_ViewCalendar .list_txt').val(tmp_dv);
                         $('#list_ViewCalendar .list_txt').attr('readonly', 'readonly');
                         $('#list_ViewCalendar .list_txt').attr('data-id', tmp_uid);
-
                         $('#list_ViewCalendar .list-content .list-Owner span').html(tmp_user);
-
 
                         $('#list_ViewCalendar .list-color span').each(function() {
                             // 遍历试图匹配日历颜色，
@@ -634,9 +632,10 @@ function ResourceCalDAVList() {
                     // 点击之后弹出编辑日历对话框
                     if ($('#list_EditCalendar').css('display') === 'none') {
                         $('#list_EditCalendar').css({
-                            display: 'block',
                             top: $(this).offset().top - 35,
                         });
+
+                        $('#list_EditCalendar').css('display', 'block');
                         $('.ezz').css('z-index', 25);
 
                         // --添加数据：标题、是否共享、颜色--
@@ -688,7 +687,7 @@ function ResourceCalDAVList() {
                         netDeleteCalendar(globalResourceCalDAVList.getCollectionByUID(tmp_uid));
                     }
                 }
-                $('#list_EditCalendar').css('display', 'none');
+                $('#list_EditCalendar').hide('slow');
                 $('.ezz').css('z-index', -1);
             });
         }
@@ -815,6 +814,17 @@ function ResourceCalDAVList() {
             // collectionChBoxClick (newElement.find('input[type=checkbox]').get(0), '#ResourceCalDAV'+todoString+'List', '.resourceCalDAV'+todoString+'_header', '.resourceCalDAV'+todoString+'_item', null, false);
             collectionChBoxClick(newElement.find('input[type=checkbox]').get(0), '#ResourceCalDAV' + todoString + 'List', '.resourceCalDAV' + todoString + '_header', '.myListItem', null, false);
         }
+
+        // -- fix the bug for cannot display newCalendar's events... --
+        newElement.find('input.regular-checkbox').trigger('click');
+        newElement.find('input.regular-checkbox').trigger('click');
+        // var collection = globalResourceCalDAVList.getCollectionByUID(inputResource.uid);
+        // collection.fcSource = $('#calendar').fullCalendar('addEventSource', 
+        //                                         {   events:          globalEventList.displayEventsArray[inputResource.uid],
+        //                                             backgroundColor: hexToRgba(collection.ecolor, 0.9),
+        //                                             borderColor:     collection.ecolor,
+        //                                             textColor:       checkFontColor(collection.ecolor),
+        //                                             background:      true});
     }; //插入资源
 
     this.removeOldResources = function(inputUidBase, inputTimestamp) {

@@ -1,248 +1,279 @@
 @charset "utf-8";
-@import "z";
-@import "css3";
 @import "event_var";
+@import "css3";
 
 // ===Event 事件对话框===
+    .l-h(@h) { height: @h; line-height: @h; }
+    .bc() { margin-left: auto; margin-right: auto; }
+    .clearfix() {
+        *zoom: 1;
+
+        &:before,
+        &:after {
+            display: table;
+            content: "";
+            line-height: 0;
+        }
+        &:after {
+            clear: both;
+        }
+    }
 
 // --最外层的包裹容器--
-	.headerContainer, .outerContainer, .eventButtons {
-		// 公共属性
-		width: @container_w;
-	}
+    .headerContainer, .outerContainer, .eventButtons {
+        // 公共属性
+        width: @container_w;
+    }
 
-	.headerContainer {
-		height: @container_h - 1;
-		margin: 15px auto 0px;
+    #eventLoader {
+        position: absolute; 
+        display: none;
+        z-index: 30;
+        width: 100%; 
+        height: 100%; 
+        
+        .loader {
+            position: absolute; 
+        }
 
-		.bor();
-		.border-radius(@container_br);
+        .loaderDisabler {
+            width: 100%; 
+            height: 100%; 
+            background-color: #000;
+            opacity: 0.3;
+        }
+    } 
 
-		.header {
-			width: @container_w;
-			padding: 0;
-			text-indent: 15px;
-			color: @text-c;
+    .headerContainer {
+        height: @container_h - 1;
+        margin: 15px auto 0px;
 
-			.rel();
-			.font-s16();
-			.font-w400();
-			.l-h(@container_h - 1);
-			.border-radius(5px);
-		}
+        .bor();
+        .border-radius(@container_br);
 
-		textarea::-webkit-input-placeholder, input::-webkit-input-placeholder { 
-			color: @text-c; 
-		}
-	}
+        .header {
+            width: @container_w;
+            padding: 0;
+            text-indent: 15px;
+            color: @text-c;
 
-	.outerContainer {
-		/*最外层的容器*/
-		margin: 20px auto 0px;
-		background-color: #fff;
-		overflow: hidden;
+            position: relative;
+            font-size: 16px;
+            font-weight: 400;
+            .l-h(@container_h - 1);
+            .border-radius(5px);
+        }
 
-		.bc();
-		.bor();
-		.border-radius(@container_br);
+        textarea::-webkit-input-placeholder, input::-webkit-input-placeholder { 
+            color: @text-c; 
+        }
+    }
 
-	 	.label {
-			width: @label_w;
-			text-indent: 5px;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
+    .outerContainer {
+        /*最外层的容器*/
+        margin: 20px auto 0px;
+        background-color: #fff;
+        overflow: hidden;
 
-			.d-ib();
-			.l-h(@container_h - 1);
-		}
+        .bc();
+        .bor();
+        .border-radius(@container_br);
 
-		.labelRightContent {
-			/*位于label右侧部分的容器*/ 
-			width: @container_w - @label_w - @pl_indent - @container_ml * 2 - 10;
-			margin-top: 5px; 
-			padding-left: @pl_indent;
-			vertical-align: top; 
+        .label {
+            width: @label_w;
+            text-indent: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
 
-			.d-ib();
-			.bor-left();
-			.l-h(@line_h);
-		}
+            display: inline-block;
+            .l-h(@container_h - 1);
+        }
 
-		.dateSelect {
-			width: @ds_w; 
-			vertical-align: top; 
+        .labelRightContent {
+            /*位于label右侧部分的容器*/ 
+            width: @container_w - @label_w - @pl_indent - @container_ml * 2 - 10;
+            margin-top: 5px; 
+            padding-left: @pl_indent;
+            vertical-align: top; 
 
-			.d-ib();
+            display: inline-block;
+            .bor-left();
+            .l-h(@line_h);
+        }
 
-			input {
-				width: 100%;
-				height: @line_h;
-				margin-top: 4px;
-				padding-left: @pl_indent;
+        .dateSelect {
+            width: @ds_w; 
+            vertical-align: top; 
 
-				.bor-left();
-			}
-		}
-	}
+            display: inline-block;
 
-	.eventButtons {
-		// 位于最下侧的按钮容器
-		height: @line_h;
-		margin: 8px auto;
-		.clearfix();
-		
-		input {
-			// 具体的按钮
-			// width: 50px;
-			border: none;
-			padding: 0 @pl_indent;
-			background-color: @event_details_bgc;
+            input {
+                width: 100%;
+                height: @line_h;
+                margin-top: 4px;
+                padding-left: @pl_indent;
 
-			.l-h(@line_h);
-			.font-s16();
-		}
-	}
+                .bor-left();
+            }
+        }
+    }
+
+    .eventButtons {
+        // 位于最下侧的按钮容器
+        height: @line_h;
+        margin: 8px auto;
+        .clearfix();
+        
+        input {
+            // 具体的按钮
+            // width: 50px;
+            border: none;
+            padding: 0 @pl_indent;
+            background-color: @event_details_bgc;
+
+            .l-h(@line_h);
+            font-size: 16px;
+        }
+    }
 
 // --位于Container中的具体容器的包裹层--
-	.oneTopContainer, .oneMidContainer, .oneBottomContainer, 
-	.endrepeatContainer, .lastContainer {
-		width: @container_w - @container_ml * 2;
-		margin-left: @container_ml;
-	}
+    .oneTopContainer, .oneMidContainer, .oneBottomContainer, 
+    .endrepeatContainer, .lastContainer {
+        width: @container_w - @container_ml * 2;
+        margin-left: @container_ml;
+    }
 
-	.oneTopContainer, .oneMidContainer {
-		/*两行中较高一行的容器, 和三行中间的容器*/
-		height: @container_h - 1;
+    .oneTopContainer, .oneMidContainer {
+        /*两行中较高一行的容器, 和三行中间的容器*/
+        height: @container_h - 1;
 
-		.bor-bottom();
-	}
+        .bor-bottom();
+    }
 
-	.oneBottomContainer, .endrepeatContainer {
-		/*两行中较低一行的容器, 和包裹重复事件结束时间的容器*/
-		height: @container_h;
-	}
+    .oneBottomContainer, .endrepeatContainer {
+        /*两行中较低一行的容器, 和包裹重复事件结束时间的容器*/
+        height: @container_h;
+    }
 
-	.lastContainer {
-		/*最后一个容器（备注）*/
-		height: @container_h * 2;
-	}
+    .lastContainer {
+        /*最后一个容器（备注）*/
+        height: @container_h * 2;
+    }
 
-	.endrepeatContainer {
-		// 包裹重复事件结束时间的容器
-		.d-n();
-	}
-
-
+    .endrepeatContainer {
+        // 包裹重复事件结束时间的容器
+        display: none;
+    }
 
 #event_details_template {
-	width: @event_details_w;
-	background-color: @event_details_bgc;
-	overflow-x: hidden; 
-	overflow-y: auto;
+    width: @event_details_w;
+    background-color: @event_details_bgc;
+    overflow-x: hidden; 
+    overflow-y: auto;
 
-	.abs();
-	.d-n();
-	.bor();
-	.border-radius(10px);
-	.z-index(26);
+    position: absolute;
+    display: none;
+    .bor();
+    .border-radius(10px);
+    z-index: 26;
 
-	select {
-		.font-s16();
-		left: 0px;
-		width: 100%;
-		height: 100%;
-		margin: 0px 0px 0px 0px;
-		padding: 0px 0px 0px 0px;
-		border: none;
+    select {
+        font-size: 16px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        margin: 0px 0px 0px 0px;
+        padding: 0px 0px 0px 0px;
+        border: none;
 
-		background: url(../images/select.png) no-repeat center right;
+        background: url(../images/select.png) no-repeat center right;
 
-		padding-left: 3px;	/* minor problem with chrome on windows */
-		padding-right: 19px;	/* original: 18 - minor problem with chrome on windows */
+        padding-left: 3px;  /* minor problem with chrome on windows */
+        padding-right: 19px;    /* original: 18 - minor problem with chrome on windows */
 
-		appearance: none;
-		-webkit-appearance: none;
+        appearance: none;
+        -webkit-appearance: none;
 
-		border-radius: 0px;
-		-webkit-border-radius: 0px;
-		-moz-border-radius: 0px;
+        border-radius: 0px;
+        -webkit-border-radius: 0px;
+        -moz-border-radius: 0px;
 
-		outline: none;
-		-moz-outline: none;
+        outline: none;
+        -moz-outline: none;
 
-		color: #333;
+        color: #333;
 
-		&:hover {
-			background: url(../images/select_hover.png) no-repeat center right;
-		}
-	}
+        &:hover {
+            background: url(../images/select_hover.png) no-repeat center right;
+        }
+    }
 }
 
 #time_from_cell, #time_to_cell {
-	width: @tc_w; 
-	vertical-align: top; 
+    width: @tc_w; 
+    vertical-align: top; 
 
-	.d-ib();
+    display: inline-block;
 
-	input {
-		width: 100%;
-		height: @line_h;
-		margin-top: 4px;
-		padding-left: @pl_indent;
+    input {
+        width: 100%;
+        height: @line_h;
+        margin-top: 4px;
+        padding-left: @pl_indent;
 
-		.bor-left();
-	}
+        .bor-left();
+    }
 }
 
 #url_EVENT, #note {
-	width: @container_w;
-	text-indent: 5px;
-	padding: 0;
+    width: @container_w;
+    text-indent: 5px;
+    padding: 0;
 
-	.font-s16();
+    font-size: 16px;
 }
 
 #calendarLine, #note_tr, #url_tr, #url_EVENT, #note {
-	height: 100%;
-	width: 100%;
+    height: 100%;
+    width: 100%;
 }
 
 #closeButton {
-	// 位于右下角的取消按钮
-	color: @closeB_c;
+    // 位于右下角的取消按钮
+    color: @closeB_c;
 
-	.fr();
+    float: right;
 }
 
 #saveButton {
-	// 位于右下角的确定按钮
-	color: @saveB_c;
+    // 位于右下角的确定按钮
+    color: @saveB_c;
 
-	.bor-left();
-	.fr();
+    .bor-left();
+    float: right;
 }
 
 #deleteButton {
-	// 位于左下角的确定按钮
-	color: @deleteB_c;
+    // 位于左下角的确定按钮
+    color: @deleteB_c;
 }
 
 #eventColor {
-	// 日历的颜色
-	width: 15px;
-	height: 15px;
-	.border-radius(50%);
-	background-color: #f0f0f0;
+    // 日历的颜色
+    width: 15px;
+    height: 15px;
+    .border-radius(50%);
+    background-color: #f0f0f0;
 
-	user-select: none;
-	-webkit-user-select: none;
-	-moz-user-select: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
 }
 
 #event_calendar {
-	width: 92% !important;
+    width: 92% !important;
 }
 
-#repeat, #allday {	
+#repeat, #allday {  
 }

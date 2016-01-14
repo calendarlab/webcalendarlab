@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" manifest="cache.manifest">
-<!-- <html lang="en"> -->
+<!-- <html lang="zh-CN" manifest="cache.manifest"> -->
+<html lang="zh-CN">
 <head>
     <title>CMRILBS_CalDavZAP</title>
     <meta http-equiv="cache-control" content="no-cache" />
@@ -8,17 +8,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <link rel="stylesheet" href="css/default.css" type="text/css" />
-    <link rel="stylesheet" href="css/event.css" type="text/css" />
-    <link rel="stylesheet" href="css/index.css" type="text/css" />
-    <link rel="stylesheet" href="css/CalDAVList.css" type="text/css" />
-    <link rel="stylesheet" href="css/jquery-ui.custom.css" type="text/css" />
-    <link rel="stylesheet" href="css/spectrum.custom.css" type="text/css" />
-    <link rel="stylesheet" href="css/fullcalendar.css" type="text/css" />
-    <link rel="stylesheet" href="css/jquery.mCustomScrollbar.css" type="text/css" />
-    <link rel="stylesheet" href="css/list-color.css" type="text/css" />
-    <link rel="stylesheet" href="css/contacts.css" type="text/css" />
-    <link rel="stylesheet" href="css/vue_comps.css" type="text/css" />
+    <link rel="stylesheet" href="css/default.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/event.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/index.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/CalDAVList.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/jquery-ui.custom.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/fullcalendar.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/jquery.mCustomScrollbar.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/list-color.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/contacts.min.css" type="text/css" />
+    <link rel="stylesheet" href="css/vue_comps.min.css" type="text/css" />
     <!--
         CalDavZAP - the open source CalDAV Web Client
         Copyright (C) 2011-2015
@@ -122,7 +121,7 @@
                 </div>
             </div>
 
-            <div id="AlertWrapper" v-show="isShow">
+            <div id="alertWrapper" v-show="isShow">
                 <div v-for = "item in alertItems">
                     <component 
                         is = "alert-component"
@@ -134,7 +133,98 @@
                     </component>
                 </div>
             </div>
-        </div>   
+
+            <!-- 日历选择器中的各行日历 -->
+            <ol id="calendarSelectWrapper" class="settingMy" v-show="isShow">
+                <div class="modalDisable" :style="{zIndex: modalZ}" @click="modalDisableClick"></div>
+                <component 
+                    is = "calendar-li-component"
+                    v-for = "item in calendarLiItems"
+                    track-by = "uid"
+                    :num = "$index"
+                    :uid = "item.uid"
+                    :is-active.sync = "item.isActive"
+                    :color = "item.color"
+                    :title = "item.title"
+                    :is-share = "item.isShare"
+                />
+            </ol>
+
+            <!-- 邀请事件消息对话框 -->
+            <div id="invitationEventBox" v-show="isShow">
+                <ul class="invitationEventBoxHeader">
+                    <li :class = "{'active': showNew}" 
+                        @click = "showNew = true">
+                        新事件邀请
+                    </li>
+                    <li :class = "{'active': !showNew}" 
+                        @click = "showNew = false">
+                        已回复邀请
+                    </li>
+                </ul>
+                
+                <div class="invitationEventBoxContent">
+                    <div v-show = "showNew">                
+                        <component 
+                            is = "invitationEventBoxPartNew" 
+                            :items = "partNewItems">                
+                        </component>
+                    </div>
+
+                    <div v-show = "!showNew">                
+                        <component 
+                            is = "invitationEventBoxPartOld" 
+                            :items = "partOldItems">
+                        </component>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 联系人对话框 -->
+            <div id = "contacts" v-show = "isShow">
+                <div class="modalDisable" :style="{zIndex: modalZ}" @click="modalDisableClick"></div>
+                <div class = "borderSpan">
+                    <img src="images/contacts_search.png" style="position: absolute; margin: 10px 10px 0 10px;">
+                    <input class="searchli" type="text" placeholder="搜索" v-model="searchQuery">
+                    <img id = "resetContactBtn" 
+                        src = "images/reset_contact.png" 
+                        v-show = "showQuery"
+                        @click = "searchQuery = ''">
+                </div>
+
+                <div class="contactContent">
+                    <!-- 显示部门-人员 两级菜单 -->
+                    <component
+                        v-for = "group in groupData"
+                        track-by = "$index"
+                        v-show = "!showQuery"
+                        is = "departmentComp"
+                        :mode = "mode"
+                        :uid = "group.uid"
+                        :name = "group.name"   
+                        :user-id = "group.userID"   
+                        :users = "userData"> 
+                    </component>
+                    
+                    <!-- 显示查询结果（人员） 一级菜单 -->
+                    <ul class = "searchContacts"
+                        v-show = "showQuery">
+                        <component
+                            v-for = "item in userData | filterBy searchQuery in searchFields"
+                            track-by = "uid"
+                            is = "contact-user-component"
+                            :mode = "mode"
+                            :uid = "item.uid"
+                            :email = "item.e_mail"
+                            :name = "item.name"   
+                            :title = "item.title"
+                            :mobile = "item.mobile"
+                            :telephone = "item.telephone"> 
+                        </component>
+                    </ul>
+                </div>
+            </div>
+        </div>      
 
         <!--seting-->
         <div id="setting-content" class="setting-content">
@@ -149,14 +239,6 @@
                             <strong>共享日历</strong>
                         </div>
                     </li>
-                    <ol class="settingMy">
-                        <li class="calendarliTemplate">
-                            <span></span>
-                            <p>工作</p>
-                            <strong class="Mycho"></strong>
-                            <strong class="sharedli">共享日历</strong>
-                        </li>
-                    </ol>
 
                 </ul>
                 <ul class="settingContainerThree">
@@ -205,13 +287,13 @@
                 <li class="liColor">
                     <p>颜色</p>
                     <div class="list-color">
-                        <span class="active" style="background-color:#b3d1eb"></span>
-                        <span style="background-color:#d4bad7;"></span>
-                        <span style="background-color:#ffcc00;"></span>
-                        <span style="background-color:#9acccd;"></span>
-                        <span style="background-color:#99cc67;"></span>
-                        <span style="background-color:#9999cd;"></span>
-                        <span style="background-color:#66cbff;"></span>
+                        <span class="active" style="background-color:#2e71e3"></span>
+                        <span style="background-color:#753cb5;"></span>
+                        <span style="background-color:#fa8700;"></span>
+                        <span style="background-color:#4ebd13;"></span>
+                        <span style="background-color:#00aed9;"></span>
+                        <span style="background-color:#ff5151;"></span>
+                        <span style="background-color:#dd3aad;"></span>
                         <div class="list-spanCur"></div>
                     </div>
                 </li>
@@ -240,13 +322,13 @@
                 <li class="liColor">
                     <p>颜色</p>
                     <div class="list-color">
-                        <span style="background: #b3d1eb" class="active"></span>
-                        <span style="background: #d4bad7;"></span>
-                        <span style="background: #ffcc00;"></span>
-                        <span style="background: #9acccd;"></span>
-                        <span style="background: #99cc67;"></span>
-                        <span style="background: #9999cd;"></span>
-                        <span style="background: #66cbff;"></span>
+                        <span style="background: #2e71e3" class="active"></span>
+                        <span style="background: #753cb5;"></span>
+                        <span style="background: #fa8700;"></span>
+                        <span style="background: #4ebd13;"></span>
+                        <span style="background: #00aed9;"></span>
+                        <span style="background: #ff5151;"></span>
+                        <span style="background: #dd3aad;"></span>
                         <div class="list-spanCur"></div>
                     </div>
                 </li>
@@ -266,13 +348,13 @@
                 <li class="liColor">
                     <p>颜色</p>
                     <div class="list-color">
-                        <span style="background: #b3d1eb" class="active"></span>
-                        <span style="background: #d4bad7;"></span>
-                        <span style="background: #ffcc00;"></span>
-                        <span style="background: #9acccd;"></span>
-                        <span style="background: #99cc67;"></span>
-                        <span style="background: #9999cd;"></span>
-                        <span style="background: #66cbff;"></span>
+                        <span style="background: #2e71e3" class="active"></span>
+                        <span style="background: #753cb5;"></span>
+                        <span style="background: #fa8700;"></span>
+                        <span style="background: #4ebd13;"></span>
+                        <span style="background: #00aed9;"></span>
+                        <span style="background: #ff5151;"></span>
+                        <span style="background: #dd3aad;"></span>
                         <div class="list-spanCur"></div>
                     </div>
                 </li>
@@ -301,13 +383,14 @@
         </div>
 
         <!-- 联系人对话框 -->
-        <div id="contacts">
+        <!-- <div id="contacts">
             <div class="borderSpan">
                 <img src="images/contacts_search.png" style="position: absolute; margin: 10px 10px 0 10px;">
                 <input class="searchli" type="text" placeholder="搜索">
                 <img id="resetContactBtn" src="images/reset_contact.png" style="visibility: visible;">
             </div>
-        </div>
+            <div class="contactContent"></div>
+        </div> -->
 
         <!-- 添加他人日历对话框 -->
         <div id="addOthersCalendarDetail">
@@ -315,30 +398,19 @@
             <ul class="others-calendars-ul"></ul>
         </div>
 
-        <!-- 邀请事件消息对话框 -->
-        <div id="invitationEventBox">
-            <ul class="invitationEventBoxul1">
-                <li class="active">新事件邀请</li>
-                <li class="">已回复邀请</li>
-            </ul>
-            
-            <ul class="box-bottom">
-                <li class="box-con1"></li>
-
-                <li class="box-con2"></li>
-            </ul>
-        </div>
-
         <!-- 设置图标 -->
         <div class="headers" id="resourceCalDAV_h">
             <span id="settings" class="headerBtn"></span>
         </div>
 
-        <!-- 弹出的设置菜单：偏好设置 ｜ 新建事件、新建日历、删除事件 ｜ 前往今天、前往日期 -->
+        <!-- 弹出的设置菜单：偏好设置 ｜ 修改密码 | 注销帐号 -->
         <div id="settingsMenu">
             <div id="menu-setting">
                 <span class="menu-title">偏好设置</span>
             </div>
+            <!-- <div id="menu-changePSD">
+                <span class="menu-title">修改密码</span>
+            </div> -->
             <div id="menu-logout">
                 <span class="menu-title">注销账号</span>
             </div>
@@ -445,15 +517,22 @@
         <div id="CAEvent">
             <div id="repeatConfirmBox">
                 <h1 data-type="repeat_event">Repeat event confirmation</h1>
-                <div id="repeatConfirmBoxContent"></div>
+                <!-- <div id="repeatConfirmBoxContent"></div> -->
                 <div id="repeatConfirmBoxQuestion"></div>
-                <input id='editAll' type="button" value="All events" /><br />
-                <input id='editFuture' type="button" value="All future events" /><br />
-                <input id='editOnlyOne' type="button" value="This event only"/><br />
-                <input type="button" data-type="closeRepeat" value="Close" onclick="$('#repeatConfirmBoxContent').html(''); $('#repeatConfirmBox').css('visibility', 'hidden'); $('#EventDisabler').fadeOut(globalEditorFadeAnimation);" />
+                <div class="buttonContainer">
+                    <input type="button" data-type="closeRepeat" value="Close" onclick="$('#repeatConfirmBoxContent').html(''); $('#repeatConfirmBox').css('visibility', 'hidden'); $('#EventDisabler').fadeOut(globalEditorFadeAnimation);" />
+                    <input id='editFuture' type="button" value="All future events" />
+                    <input id='editAll' type="button" value="All events" />
+                    <input id='editOnlyOne' type="button" value="This event only"/>
+                </div>
             </div>
             
             <div id="event_details_template">
+                <div id="eventLoader">
+                    <div class="loader"></div>
+                    <div class="loaderDisabler"></div>
+                </div>
+
                 <div id="eventDetailsContainer">
                     <div id="eventDetailsTable">
                         <div class="headerContainer">
@@ -621,221 +700,12 @@
                                 <td class="label repeat"><label data-type="repeat_type" for="repeat_interval_detail">Every </label></td>
                                 <td style="position: relative;">
                                     <input class="small" type="text" data-type="PH_type_Interval" placeholder="Interval" name="end" id="repeat_interval_detail" />
-                                    <div class="invalidWrapper"><img data-type="invalidSmall" style="display: none;" src="images/error_b.svg" alt="invalid" /></div>
+                                    <!-- <div class="invalidWrapper"><img data-type="invalidSmall" style="display: none;" src="images/error_b.svg" alt="invalid" /></div> -->
                                 </td>
                                 <td>
                                     <span class="infoSpan" style="padding-left: 4px;" data-type="txt_interval">days</span>
                                 </td>
                             </tr>
-
-                        <!--                            
-                            <tr id="week_custom" style="display: none;">
-                                <td class="label repeat"><label data-type="week_custom_txt">On </label></td>
-                                <td colspan="2">
-                                    <table class="customTable customTableWeek">
-                                        <tr>
-                                            <td data-type="0" data-text="SU" class="firstCol">Su</td>
-                                            <td data-type="1" data-text="MO">Mo</td>
-                                            <td data-type="2" data-text="TU">Tu</td>
-                                            <td data-type="3" data-text="WE">We</td>
-                                            <td data-type="4" data-text="TH">Th</td>
-                                            <td data-type="5" data-text="FR">Fr</td>
-                                            <td data-type="6" data-text="SA" class="lastCol">Sa</td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr id="month_custom1" style="display: none;">
-                                <td class="label"><label data-type="month_custom1_txt"></label></td>
-                                <td data-size="half">
-                                    <select id="repeat_month_custom_select" class="small">
-                                        <option value="every" data-type="month_custom_every">Every</option>
-                                        <option value="first" data-type="month_custom_first">First</option>
-                                        <option value="second" data-type="month_custom_second">Second</option>
-                                        <option value="third" data-type="month_custom_third">Third</option>
-                                        <option value="fourth" data-type="month_custom_fourth">Fourth</option>
-                                        <option value="fifth" data-type="month_custom_fifth">Fifth</option>
-                                        <option value="last" data-type="month_custom_last">Last</option>
-                                        <option value="custom" data-type="month_custom_custom">Custom</option>
-                                    </select>
-                                </td>
-                                <td style="position: relative;" data-size="half">
-                                    <select id="repeat_month_custom_select2" class="small">
-                                        <option value="SU" data-type="0">Sunday</option>
-                                        <option value="MO" data-type="1">Monday</option>
-                                        <option value="TU" data-type="2">Tuesday</option>
-                                        <option value="WE" data-type="3">Wednesday</option>
-                                        <option value="TH" data-type="4">Thursday</option>
-                                        <option value="FR" data-type="5">Friday</option>
-                                        <option value="SA" data-type="6">Saturday</option>
-                                        <option value="DAY" data-type="month_custom_month">Day of the month</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr id="month_custom2" style="display: none;">
-                                <td class="label repeat"><label data-type="month_custom2_txt">On days</label></td>
-                                <td colspan="2">
-                                    <table class="customTable customTableMonth">
-                                        <tr>
-                                            <td data-type="1" class="firstCol">1</td>
-                                            <td data-type="2">2</td>
-                                            <td data-type="3">3</td>
-                                            <td data-type="4">4</td>
-                                            <td data-type="5">5</td>
-                                            <td data-type="6">6</td>
-                                            <td data-type="7" class="lastCol">7</td>
-                                        </tr>
-                                        <tr>
-                                            <td data-type="8" class="firstCol">8</td>
-                                            <td data-type="9">9</td>
-                                            <td data-type="10">10</td>
-                                            <td data-type="11">11</td>
-                                            <td data-type="12">12</td>
-                                            <td data-type="13">13</td>
-                                            <td data-type="14" class="lastCol">14</td>
-                                        </tr>
-                                        <tr>
-                                            <td data-type="15" class="firstCol">15</td>
-                                            <td data-type="16">16</td>
-                                            <td data-type="17">17</td>
-                                            <td data-type="18">18</td>
-                                            <td data-type="19">19</td>
-                                            <td data-type="20">20</td>
-                                            <td data-type="21" class="lastCol">21</td>
-                                        </tr>
-                                        <tr>
-                                            <td data-type="22" class="firstCol">22</td>
-                                            <td data-type="23">23</td>
-                                            <td data-type="24">24</td>
-                                            <td data-type="25">25</td>
-                                            <td data-type="26">26</td>
-                                            <td data-type="27">27</td>
-                                            <td data-type="28" class="lastCol">28</td>
-                                        </tr>
-                                        <tr>
-                                            <td data-type="29" class="firstCol">29</td>
-                                            <td data-type="30">30</td>
-                                            <td data-type="31">31</td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr id="year_custom2" style="display: none;">
-                                <td class="label"><label data-type="year_custom2"></label></td>
-                                <td data-size="half">
-                                    <select id="repeat_year_custom_select1" class="small">
-                                        <option value="every" data-type="year_custom_every">Every</option>
-                                        <option value="first" data-type="year_custom_first">First</option>
-                                        <option value="second" data-type="year_custom_second">Second</option>
-                                        <option value="third" data-type="year_custom_third">Third</option>
-                                        <option value="fourth" data-type="year_custom_fourth">Fourth</option>
-                                        <option value="fifth" data-type="year_custom_fifth">Fifth</option>
-                                        <option value="last" data-type="year_custom_last">Last</option>
-                                        <option value="custom" data-type="year_custom_custom">Custom</option>
-                                    </select>
-                                </td>
-                                <td style="position: relative;" data-size="half">
-                                    <select id="repeat_year_custom_select2" class="small">
-                                        <option value="SU" data-type="0">Sunday</option>
-                                        <option value="MO" data-type="1">Monday</option>
-                                        <option value="TU" data-type="2">Tuesday</option>
-                                        <option value="WE" data-type="3">Wednesday</option>
-                                        <option value="TH" data-type="4">Thursday</option>
-                                        <option value="FR" data-type="5">Friday</option>
-                                        <option value="SA" data-type="6">Saturday</option>
-                                        <option value="DAY" data-type="year_custom_month">Day of the month</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr id="year_custom1" style="display: none;">
-                                <td class="label repeat"><label data-type="year_custom1">Every</label></td>
-                                <td colspan="2">
-                                    <table class="customTable customTableMonth">
-                                        <tr>
-                                            <td data-type="1" class="firstCol">1</td>
-                                            <td data-type="2">2</td>
-                                            <td data-type="3">3</td>
-                                            <td data-type="4">4</td>
-                                            <td data-type="5">5</td>
-                                            <td data-type="6">6</td>
-                                            <td data-type="7" class="lastCol">7</td>
-                                        </tr>
-                                        <tr>
-                                            <td data-type="8" class="firstCol">8</td>
-                                            <td data-type="9">9</td>
-                                            <td data-type="10">10</td>
-                                            <td data-type="11">11</td>
-                                            <td data-type="12">12</td>
-                                            <td data-type="13">13</td>
-                                            <td data-type="14" class="lastCol">14</td>
-                                        </tr>
-                                        <tr>
-                                            <td data-type="15" class="firstCol">15</td>
-                                            <td data-type="16">16</td>
-                                            <td data-type="17">17</td>
-                                            <td data-type="18">18</td>
-                                            <td data-type="19">19</td>
-                                            <td data-type="20">20</td>
-                                            <td data-type="21" class="lastCol">21</td>
-                                        </tr>
-                                        <tr>
-                                            <td data-type="22" class="firstCol">22</td>
-                                            <td data-type="23">23</td>
-                                            <td data-type="24">24</td>
-                                            <td data-type="25">25</td>
-                                            <td data-type="26">26</td>
-                                            <td data-type="27">27</td>
-                                            <td data-type="28" class="lastCol">28</td>
-                                        </tr>
-                                        <tr>
-                                            <td data-type="29" class="firstCol">29</td>
-                                            <td data-type="30">30</td>
-                                            <td data-type="31">31</td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr id="year_custom3" style="display: none;">
-                                <td class="label repeat"><label data-type="year_custom3">Of</label></td>
-                                <td colspan="2">
-                                    <table class="customTable customTableYear">
-                                        <tr>
-                                            <td data-type="0" data-text="jan" class="firstCol">Jan</td>
-                                            <td data-type="1" data-text="feb">Feb</td>
-                                            <td data-type="2" data-text="mar">Mar</td>
-                                            <td data-type="3" data-text="apr" class="lastCol">Apr</td>
-                                        </tr>
-                                        <tr>
-                                            <td data-type="4" data-text="may" class="firstCol">May</td>
-                                            <td data-type="5" data-text="jun">Jun</td>
-                                            <td data-type="6" data-text="jul">Jul</td>
-                                            <td data-type="7" data-text="aug" class="lastCol">Aug</td>
-                                        </tr>
-                                        <tr>
-                                            <td data-type="8" data-text="sep" class="firstCol">Sep</td>
-                                            <td data-type="9" data-text="oct">Oct</td>
-                                            <td data-type="10" data-text="nov">Nov</td>
-                                            <td data-type="11" data-text="dec" class="lastCol">Dec</td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr> -->
-                            <!-- <tr id="repeat_details" style="display: none;">
-                                <td class="label repeat"><label data-type="repeat_end"  for="repeat_end_details">end: </label></td>
-                                <td data-size="half">
-                                    <select class="small" id="repeat_end_details">
-                                        <option data-type="repeat_details_on_date" value="on_date">on date</option>
-                                        <option data-type="repeat_details_after" value="after">occurrences</option>
-                                        <option data-type="repeat_details_never" value="never">never</option>
-                                    </select>
-                                </td>
-                                <td style="position: relative;">
-                                    <input class="date small" type="text" data-type="PH_until_date" placeholder="Date until" name="end" id="repeat_end_date" />
-                                    <input style="display: none;" class="small" type="text" data-type="PH_repeat_count" placeholder="Repeat count" name="end" id="repeat_end_after" />
-                                    <div class="invalidWrapper"><img data-type="invalidSmall" style="display: none;" src="images/error_b.svg" alt="invalid" /></div>
-                                </td>
-                            </tr> 
-                        -->
 
                             <tr>
                                 <td class="label"><label data-type="status" for="status">status: </label></td>
@@ -911,11 +781,11 @@
                                 <td>
                                     <input class="small before_after_input" type="text" data-type="PH_before_after_alert" placeholder="Value" data-id="1" style="display: none;" />
                                     <input class="date small message_date_input" type="text" data-type="PH_alarm_date" placeholder="Alarm date" data-id="1" />
-                                    <div class="invalidWrapper"><img data-type="invalidSmall" data-id="1" style="display: none;" src="images/error_b.svg" alt="invalid" /></div>
+                                    <!-- <div class="invalidWrapper"><img data-type="invalidSmall" data-id="1" style="display: none;" src="images/error_b.svg" alt="invalid" /></div> -->
                                 </td>
                                 <td>
                                     <input class="time small message_time_input" type="text" data-type="PH_alarm_time" placeholder="Alarm time" data-id="1" />
-                                    <div class="invalidWrapper"><img data-type="invalidSmall" data-id="1" style="display: none;" src="images/error_b.svg" alt="invalid" /></div>
+                                    <!-- <div class="invalidWrapper"><img data-type="invalidSmall" data-id="1" style="display: none;" src="images/error_b.svg" alt="invalid" /></div> -->
                                 </td>
                             </tr>
                         </table>
@@ -945,35 +815,184 @@
     </div>
 
     <!-- templates -->
-    <template id="alert-comp-tmpl">
-        <div
-            class   = "alertContainer"
-            v-show  = "isShow"
-            transition = "fade"
-            role = "alert">
+        <template id = "contact-user-comp-tmpl">
+            <li :data-id = "uid"
+                @click = "oneUserClick"
+                :class = "{'active': isActive}">
+                <span>{{ name }}</span>
+                <!-- <img src='images/list_item.png'
+                    @click.stop = "userDetailClick"> --> 
+            </li>
+        </template>
 
-            <!-- 右上角关闭按钮 -->
-            <span 
-                class = "close"
-                @click = "isShow = false">
-                &times;
-            </span>
+        <template id = "contact-department-comp-tmpl">
+            <div class = "group" :data-id = "uid"> 
+                <div class = "groupHeader"
+                    @click = "groupHeaderClick"> 
 
-            <slot></slot>
-        </div>
-    </template>
-
-    <template id="time-count-comp-tmpl">
-        <!-- 天和小时选择的模板：包括一个input，和增加减少的两个按钮 -->
-        <div class="timeWrapper">
-            <div class="timeCenter">
-                <input v-model="count | numberDisplay" lazy number>
-                <span class="timeUp" @click = "addTime"></span>
-                <span class="timeDown" @click = "count>0 ? count-- : count"></span>
+                    <span class = "groupTitle">{{ title }}</span> 
+                </div> 
+                
+                <ul v-show = "isShowUser"
+                    class = "myContacts">
+                    <component
+                        v-for = "item in userID"
+                        track-by = "$index"
+                        is = "contact-user-component"
+                        :mode = "mode"
+                        :uid = "users[item].uid"
+                        :email = "users[item].e_mail"
+                        :name = "users[item].name"   
+                        :title = "users[item].title"
+                        :mobile = "users[item].mobile"
+                        :telephone = "users[item].telephone">
+                    </component>
+                </ul>  
             </div>
-            <span>{{time_txt}}</span>
-        </div>
-    </template>
+        </template>
+
+        <template id = "invitation-inputbox-comp-tmpl">
+            <div class = "box-yesno"> 
+                <span 
+                    @click = "leftBtnClick"
+                    v-show = "leftBtnTxt != ''" 
+                    :class = "{'done': compMode=='declined'}" >{{ leftBtnTxt }}</span> 
+                <span 
+                    @click = "rightBtnClick"
+                    :class = "{'agree': compMode!='agreed', 'done': compMode=='agreed'}">{{ rightBtnTxt }}</span> 
+            </div> 
+        </template>
+
+        <template id="invite-part-old-comp-tmpl">
+            <div v-for = "item in items"
+                transition = "fade"
+                transition-mode = "out-in">            
+                <component
+                    is = "oldInvitationComp"
+                    :uid = "item.uid"
+                    :title = "item.title"
+                    :time = "item.time"
+                    :user = "item.user"   
+                    :color = "item.color"
+                    :mode = "item.mode">  
+                </component>
+            </div>
+        </template>
+
+        <template id="old-invitation-comp-tmpl">
+            <div class="invitationEventBoxItemWrapper">
+                <div class="invitationEventBoxItem" :data-id="uid"> 
+                    <h5>
+                        <strong :style="{'background': color}"></strong>  
+                        {{ title }} 
+                    </h5> 
+                    <p>{{ time }}</p> 
+                    <p>{{ user }} 邀请您加入事件</p> 
+
+                    <component 
+                        is = "invitation-inputbox-component"
+                        :comp-mode = "mode">
+                    </component>
+                </div> 
+            </div>
+        </template>
+
+        <template id="invite-part-new-comp-tmpl">
+            <div v-for = "item in items"
+                transition = "fade"
+                transition-mode = "out-in">            
+                <component
+                    :is = "item.compView"
+                    :head = "item.head"
+                    :uid = "item.uid"
+                    :title = "item.title"
+                    :time = "item.time"
+                    :user = "item.user"
+                    :color = "item.color"
+                />
+            </div>
+        </template>
+
+        <template id="response-comp-tmpl">
+            <div class="invitationEventBoxItemWrapper">  
+                <h6>被邀请人回复</h6> 
+                <div class="invitationEventBoxItem"> 
+                    <h5>
+                        <strong :style="{'background': color}"></strong>  
+                        {{ user }}拒绝邀请 
+                    </h5> 
+                    <p>{{ time }}</p> 
+                    <p>{{ title }}</p> 
+
+                    <component 
+                        is = "invitation-inputbox-component"
+                        :comp-mode = "'response'">
+                    </component>
+                </div> 
+            </div>
+        </template>
+
+        <template id="invitation-comp-tmpl">
+            <div class="invitationEventBoxItemWrapper">  
+                <h6 v-show="head">邀请</h6> 
+                <div class="invitationEventBoxItem" :data-id="uid"> 
+                    <h5>
+                        <strong :style="{'background': color}"></strong>  
+                        {{ title }} 
+                    </h5> 
+                    <p>{{ time }}</p> 
+                    <p>
+                        {{ user }} 邀请您加入事件
+                    </p> 
+
+                    <component 
+                        is = "invitation-inputbox-component"
+                        :comp-mode = "'invitation'">
+                    </component>
+                </div> 
+            </div>
+        </template>
+
+        <template id="cal-li-comp-tmpl">
+            <li :data-id = "uid"
+                @click = "calendarLiClick">
+
+                <span :style="{'background': color}"></span>
+                <p>{{ title }}</p>
+                <strong :class="{'Mycho': true, 'active': isActive}"></strong>
+                <strong class="sharedli" v-show = "isShare">共享日历</strong>
+            </li>
+        </template>
+
+        <template id="alert-comp-tmpl">
+            <div
+                class   = "alertContainer"
+                v-show  = "isShow"
+                transition = "fade"
+                role = "alert">
+
+                <!-- 右上角关闭按钮 -->
+                <span 
+                    class = "close"
+                    @click = "isShow = false">
+                    &times;
+                </span>
+
+                <slot></slot>
+            </div>
+        </template>
+
+        <template id="time-count-comp-tmpl">
+            <!-- 天和小时选择的模板：包括一个input，和增加减少的两个按钮 -->
+            <div class="timeWrapper">
+                <div class="timeCenter">
+                    <input v-model="count | numberDisplay" lazy number>
+                    <span class="timeUp" @click = "addTime"></span>
+                    <span class="timeDown" @click = "count>0 ? count-- : count"></span>
+                </div>
+                <span>{{time_txt}}</span>
+            </div>
+        </template>
     <!-- templates over -->
 
     <!-- scripts -->
@@ -988,7 +1007,6 @@
     <script src="lib/jquery.quicksearch.js" type="text/javascript"></script>
     <script src="lib/jquery.placeholder-1.1.9.js" type="text/javascript"></script>
     <script src="lib/jshash-2.2_sha256.js" type="text/javascript"></script>
-    <script src="lib/spectrum.js" type="text/javascript"></script>
     <script src="lib/fullcalendar.js" type="text/javascript"></script>
     <script src="js/vue_comps.js" type="text/javascript"></script>
     <script src="js/config.js" type="text/javascript"></script>
